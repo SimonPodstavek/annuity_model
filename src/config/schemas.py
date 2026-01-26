@@ -23,10 +23,15 @@ class InterestRateModel(str, Enum):
     FIXED = "FIXED"
     SVENSSON = "SVENSSON"
 
+class Sex(Enum):
+    MALE = "M"
+    FEMALE = "F"
+    TOTAL = "T"
+
 # This dataclass provides paths to the data source files
 @dataclass(frozen=True)
 class DataSet:
-    baseline_mortality_path: Path
+    susr_mortality_path: Path
     europop_mortality_path: Path
     svenson_parameters_path: Optional[Path] = None
 
@@ -37,43 +42,72 @@ class Discount:
     fixed_rate: Optional[float] = None
 
 
-@dataclass(frozen=True)
+@dataclass()
 class Mortality: 
-    base_mortality: MortalitySource 
-    mortality_trend: MortalityTrendSource
+    # Types of baseline mortality and mortality trends
+    baseline_mortality_type: MortalitySource 
+    mortality_trend_type: MortalityTrendSource
+
+    # Paths to baseline mortality and mortality trends as chosen in config
+    baseline_mortality_path: Optional[Path] = None
+    mortality_trend_path: Optional[Path] = None
+
+    def set_mortality_path(self, dataset) -> None:
+
+        if(self.baseline_mortality_type == MortalitySource.SUSR):
+            self.baseline_mortality_path = dataset.susr_mortality_path
+        elif (self.baseline_mortality_type == MortalitySource.EUROPOP):
+            self.baseline_mortality_path = dataset.susr_mortality_path
+        else:
+            raise Exception("Incorrect baseline mortality selected")
+        
+        if(self.mortality_trend_type == MortalityTrendSource.SUSR):
+            self.mortality_trend_path = dataset.susr_mortality_path
+        elif (self.mortality_trend_type == MortalityTrendSource.EUROPOP):
+            self.mortality_trend_path = dataset.europop_mortality_path
+        elif(self.mortality_trend_type == MortalityTrendSource.LAST_AVAILABLE_MORTALITY):
+            self.mortality_trend_path = self.baseline_mortality_path
+        else:
+            raise Exception("Incorrect mortality trend selected")
+        
+    # Constraints
     # min_age is the minimum age that the annuity calculation can start at
-    min_age = 30
+    min_initial_age = 30
+    max_initial_age = 98
     # terminal_age is the assumed maximum attainable age
     terminal_age = 130
-    # Are Males and Females priced differently?
-    sex_separated: bool
 
-@dataclass(frozen=True)
+@dataclass()
 class Config:
-    present_year = 2026
     dataset: DataSet
     discount: Discount
     mortality: Mortality
+    sex_separated: bool
+    present_year: int = 2026
 
 # SUSR initial mortality + EUROPOP trend with fixed risk-free rate at 2% p.a.
 dataset = DataSet(
-    baseline_mortality_path = Path(BASE_DIR / "data" / "susr_mortality.xlsx"),
-    europop_mortality_path = Path(BASE_DIR / "data" / "europop_mortality.xlsx")
+    susr_mortality_path = Path(BASE_DIR / "src/data/susr_mortality.xlsx" ),
+    europop_mortality_path = Path(BASE_DIR / "src/data/europop_mortality.xlsx")
 )
+
+
+mortality = Mortality(
+    baseline_mortality_type = MortalitySource.SUSR,
+    mortality_trend_type = MortalityTrendSource.EUROPOP,
+)
+
+mortality.set_mortality_path(dataset)
 
 discount = Discount(
     discount_model = 'fixed', 
     fixed_rate = 0.02
 )
 
-mortality = Mortality(
-    base_mortality = MortalitySource.SUSR,
-    mortality_trend = MortalityTrendSource.EUROPOP,
-    sex_separated = True
-)
 
 config = Config(
     dataset = dataset,
     discount = discount,
-    mortality = mortality
+    mortality = mortality,
+    sex_separated = True
 )
