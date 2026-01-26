@@ -1,2 +1,7 @@
 src/data/
 src/.venv/
+data/
+.venv/
+venv/
+__pycache__/
+*.pyc
