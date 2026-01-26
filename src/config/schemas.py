@@ -82,7 +82,7 @@ class Config:
     dataset: DataSet
     discount: Discount
     mortality: Mortality
-    sex_separated: bool
+    sex_separated: bool = True
     present_year: int = 2026
 
 # SUSR initial mortality + EUROPOP trend with fixed risk-free rate at 2% p.a.
@@ -108,6 +108,5 @@ discount = Discount(
 config = Config(
     dataset = dataset,
     discount = discount,
-    mortality = mortality,
-    sex_separated = True
+    mortality = mortality
 )
