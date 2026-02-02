@@ -49,6 +49,10 @@ class DiscountRate:
         
         def calculateSvenssonInterestRate(svensson_parameters, t_delta):
             t_delta = t_delta+1 
+            
+            if (t_delta > 30):
+                t_delta = 30
+            
             b0,b1,b2,b3,t1,t2 = (
                 svensson_parameters["b0"],
                 svensson_parameters["b1"],
@@ -74,14 +78,18 @@ class DiscountRate:
             if (config.discount.discount_model == InterestRateModel.FIXED and config.discount.fixed_rate == None):
                 raise Exception("Fixed interest rate must be set in order to determine the discount factor")
 
-            # Set fixed rate to zero if such discounting is selected
+            # Set fixed rate to zero if discounting is disabled
             if config.discount.discount_model == InterestRateModel.ZERO:
-                config.discount.fixed_rate = 0
+                fixed_rate = 0
+            elif config.discount.discount_model == InterestRateModel.FIXED:
+                fixed_rate = config.discount.fixed_rate
+
+            
 
             discount_factor = 1
             for t_delta in range(0, 110):
                 self.discount_factor_series[t_delta] = 1/discount_factor
-                discount_factor = discount_factor * (1+ config.discount.fixed_rate)        
+                discount_factor = discount_factor * (1 + fixed_rate)        
 
 
 
@@ -127,10 +135,10 @@ class Valuation():
             survival_function[t_delta+1] = survival_function[t_delta] * (1- qx * np.exp(beta*t_delta))
         
 
-        annuity_factor_future = 0
+        annuity_factor_PV = 0
 
         for t_delta in range(initial_delta, last_delta): 
-            annuity_factor_future += survival_function[t_delta] * self.discount_rate.discount_factor_series[t_delta] 
+            annuity_factor_PV += survival_function[t_delta] * self.discount_rate.discount_factor_series[t_delta] 
         
-        annuity_factor_adj = survival_function[initial_delta] * annuity_factor_future
+        annuity_factor_adj = survival_function[initial_delta] * annuity_factor_PV
         return annuity_factor_adj
