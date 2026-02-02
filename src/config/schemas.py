@@ -11,6 +11,7 @@ class MortalitySource(str, Enum):
     EUROPOP = "EUROPOP"
     SUSR = "SUSR"
 
+
 # This Enum provides data source for the mortality trend
 class MortalityTrendSource(str, Enum):
     LAST_AVAILABLE_MORTALITY = "LAST_AVAILABLE_MORTALITY"
@@ -33,13 +34,13 @@ class Sex(Enum):
 class DataSet:
     susr_mortality_path: Path
     europop_mortality_path: Path
-    svenson_parameters_path: Optional[Path] = None
 
 # This dataclass provides configuration for the disocunt rates used in calculating PV of annuity
 @dataclass(frozen=True)
 class Discount:
     discount_model: InterestRateModel
     fixed_rate: Optional[float] = None
+    svenson_parameters: Optional[dict] = None
 
 
 @dataclass()
@@ -100,9 +101,27 @@ mortality = Mortality(
 mortality.set_mortality_path(dataset)
 
 discount = Discount(
-    discount_model = 'fixed', 
-    fixed_rate = 0.02
+    discount_model = InterestRateModel.FIXED, 
+    fixed_rate=0.018
 )
+
+
+
+# discount = Discount(
+#     discount_model = InterestRateModel.SVENSSON, 
+#     svenson_parameters = {"b0": 1.185696,
+#                           "b1": 0.749607,
+#                           "b2": -0.096652,
+#                           "b3": 7.659662,
+#                           "t1": 1.665456,
+#                           "t2": 15.973542}
+# )
+
+
+
+# discount = Discount(
+#     discount_model = InterestRateModel.ZERO
+#     )
 
 
 config = Config(
