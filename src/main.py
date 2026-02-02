@@ -33,8 +33,8 @@ def main() -> None:
         offers.append(round(100*(offer.mean_offer/fair_offer),2))   
         
         if(i%5==0):
-            # print(f"Age: {offer.age}, Year: {offer.year}, Q1 MWR: {offers[0]}% Q5 MWR: {offers[4]} %")
-            print(f"{offer.age} - {offer.year} - {offers[2]}")
+            print(f"Age: {offer.age}, Year: {offer.year}, Q1 MWR: {offers[0]}% Q5 MWR: {offers[4]} %")
+            # print(f"{offer.age} - {offer.year} - {offers[2]}")
             offers=[]
 
 

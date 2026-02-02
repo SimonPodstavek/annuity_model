@@ -76,7 +76,7 @@ class Mortality:
     min_initial_age = 30
     max_initial_age = 98
     # terminal_age is the assumed maximum attainable age
-    terminal_age = 130
+    terminal_age = 105
 
 @dataclass()
 class Config:
