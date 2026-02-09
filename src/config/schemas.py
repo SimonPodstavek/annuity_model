@@ -28,6 +28,7 @@ class Sex(Enum):
     MALE = "M"
     FEMALE = "F"
     TOTAL = "T"
+    WEIGHTED = "W"
 
 # This dataclass provides paths to the data source files
 @dataclass(frozen=True)
@@ -100,22 +101,22 @@ mortality = Mortality(
 
 mortality.set_mortality_path(dataset)
 
-# discount = Discount(
-#     discount_model = InterestRateModel.FIXED, 
-#     fixed_rate=0
-# )
-
-
-
 discount = Discount(
-    discount_model = InterestRateModel.SVENSSON, 
-    svenson_parameters = {"b0": 1.185696,
-                          "b1": 0.749607,
-                          "b2": -0.096652,
-                          "b3": 7.659662,
-                          "t1": 1.665456,
-                          "t2": 15.973542}
+    discount_model = InterestRateModel.FIXED, 
+    fixed_rate=0.01
 )
+
+
+
+# discount = Discount(
+#     discount_model = InterestRateModel.SVENSSON, 
+#     svenson_parameters = {"b0": 1.185696,
+#                           "b1": 0.749607,
+#                           "b2": -0.096652,
+#                           "b3": 7.659662,
+#                           "t1": 1.665456,
+#                           "t2": 15.973542}
+# )
 
 
 
