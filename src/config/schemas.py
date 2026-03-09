@@ -39,6 +39,11 @@ def verifyDataSetValidity():
 @dataclass()
 class Config:
     DATASET_PATH: dict
+    MORTALITY_MODEL: MortalityModel
     MORTALITY_CONFIG: dict
+    DISCOUNT_MODEL: InterestRateModel
     DISCOUNT_CONFIG: dict
     PURCHASE_YEAR: int
+    TERMINAL_AGE: int
+    MIN_INITIAL_AGE = 30
+    MAX_INITIAL_AGE = 100

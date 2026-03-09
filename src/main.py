@@ -1,31 +1,32 @@
 from pandas import DataFrame
-from .config.schemas import Sex
+from .config.schemas import verifyDataSetValidity, Sex
 from .config.config import config
 from .data_io.excel import read_xlsx
-from .annuity.annuity import Annuitant, MortalityTrend, DiscountRate, Valuation
+from .annuity.annuity import Annuitant, Mortality, Discount, Valuation
 
 # Configure model parameters in config/config.py
 
 
 def main() -> None:
-    baseline_mortality_df = read_xlsx(config.mortality.baseline_mortality_path, sheet_name="mortality")
-    baseline_mortality_df = baseline_mortality_df.set_index(["year", "age","sex"]).sort_index()
-    mortality_trend_df = read_xlsx(config.mortality.mortality_trend_path, sheet_name="mortality")
-    mortality_trend = MortalityTrend(mortality_trend_df)
-    mortality_trend.estimateMortalityTrend()
-    discount_rate = DiscountRate()
+    # Finish verification method
+    verifyDataSetValidity()
 
+    mortality = Mortality()
+    discount = Discount()
 
     # Compute MWR
     CIPS_annuity_df = read_xlsx("src/data/agregaty.xlsx", sheet_name="data2")
     CIPS_annuity_df = CIPS_annuity_df[CIPS_annuity_df["year"] > 2024]
 
     MWR_offers = []
+
     for i, offer in enumerate(CIPS_annuity_df.itertuples(index=True), start=1):
+
         # Annuity configuration
-        annuitant = Annuitant(age = offer.age, first_payment_year=2026, present_balance=offer.mean_balance, sex=Sex.TOTAL)
+        annuitant = Annuitant(age = offer.age, first_payment_year=2026, present_balance=offer.mean_balance, sex=Sex.MALE)
         # annuitant = Annuitant(age = 65, first_payment_year=2026, present_balance=100000, sex=Sex.WEIGHTED)
-        valuation = Valuation(annuitant, baseline_mortality_df, mortality_trend, discount_rate)
+
+        valuation = Valuation(annuitant, mortality, discount)
         annuitant.annuity_factor_adj, mod_duration = valuation.calculateAnnuityFactor()
         fair_offer = annuitant.present_balance / (12*annuitant.annuity_factor_adj)
 
@@ -37,8 +38,8 @@ def main() -> None:
         
         if(i%5==0):
             # print(f"{offer.age} {offer.year}\t{mod_duration}")
-            print(f"{offer.age} {offer.year} {round(fair_offer,2)}")
-            # print(f"{offer.age} {round((MWR_offers[0]+MWR_offers[4])/200,3)}")
+            # print(f"{offer.age} {offer.year} {round(fair_offer,2)}")
+            print(f"{offer.age} {round((MWR_offers[0]+MWR_offers[4])/200,3)}")
             MWR_offers=[]
 
 
