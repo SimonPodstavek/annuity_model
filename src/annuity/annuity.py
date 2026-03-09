@@ -21,6 +21,8 @@ class Mortality:
         
         qx_dict = {}
 
+        age_range = config.MAX_INITIAL_AGE - config.MIN_INITIAL_AGE
+
         if config.MORTALITY_MODEL == MortalityModel.FULL_MORTALITY_SURFACE:
             prediction_df = read_xlsx(config.MORTALITY_CONFIG[config.MORTALITY_MODEL]["mortality_prediction"])
             for sex in prediction_df["sex"].unique():
@@ -29,10 +31,10 @@ class Mortality:
                     mortality_df_slice = prediction_df[prediction_df["sex"] == sex]
                     values = []
                     qx_lookup = mortality_df_slice.set_index(["year", "age"])["qx"]
-                    for i, a in enumerate(range(age, config.TERMINAL_AGE+1)):
-                        used_age = a if a < config.MAX_INITIAL_AGE else config.MAX_INITIAL_AGE-1
-                        used_year = config.PURCHASE_YEAR + i if config.PURCHASE_YEAR + i < 76 else 75
-                        values.append(qx_lookup.loc[(used_year, used_age)])
+                    for i in range(age_range + 1):
+                        used_year = config.PURCHASE_YEAR + i if i < age_range +1 else config.PURCHASE_YEAR + age_range
+                        used_age = age + i  if age < config.MAX_INITIAL_AGE else config.MAX_INITIAL_AGE -1
+                        values.append(qx_lookup.loc[(used_year, age)])
 
                     qx_dict[sex][age] = values
 
@@ -46,10 +48,10 @@ class Mortality:
                     values = []
                     qx_lookup = mortality_df_slice.set_index(["year", "age"])["qx"]
 
-                    for i, a in enumerate(range(age, config.TERMINAL_AGE+1)):
-                        used_age = a if a < config.MAX_INITIAL_AGE else config.MAX_INITIAL_AGE-1
-                        used_year = latest_year
-                        values.append(qx_lookup.loc[(used_year, used_age)])
+                    for i in range(age_range + 1):
+                        used_year = config.PURCHASE_YEAR
+                        used_age = age + i if age < config.MAX_INITIAL_AGE else config.MAX_INITIAL_AGE -1
+                        values.append(qx_lookup.loc[(used_year, age)])
 
                     qx_dict[sex][age] = values
 
@@ -66,9 +68,9 @@ class Mortality:
                 for age in range(config.MIN_INITIAL_AGE, config.MAX_INITIAL_AGE):
                     mortality_df_superslice = mortality_df_slice[mortality_df_slice["age"] == age]
                     year = mortality_df_superslice["year"].to_numpy()
-                    year = year - mortality_df_superslice["year"].min() +1
+                    delta_year = year - mortality_df_superslice["year"].min() +1
                     mortality = mortality_df_superslice["qx"].to_numpy()
-                    beta, ln_a = np.polyfit(year, np.log(mortality),1)
+                    beta, ln_a = np.polyfit(delta_year, np.log(mortality),1)
                     beta_age_parameters[sex][age] = beta
             
             # Calculate mortality prediction

@@ -64,7 +64,7 @@ MORTALITY_CONFIG = {
 SEX_TYPE = Sex.FEMALE
 
 # Step 3: Set annuity pruchase year. (default 2026) This may differ from the year when the annuity starts paying out.
-PURCHASE_YEAR = 2026
+PURCHASE_YEAR = 2024
 
 # Step 4: The maximum attainable age in the model
 TERMINAL_AGE = 105
