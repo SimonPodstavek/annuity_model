@@ -1,6 +1,4 @@
-from ..config.schemas import config, Sex,MortalityTrendSource, InterestRateModel
-from math import ceil
-# from scipy.optimize import curve_fit
+from ..config.schemas import config, Sex, MortalityTrendSource, InterestRateModel
 import numpy as np
 from math import exp
 
@@ -109,7 +107,6 @@ class Valuation():
         last_delta = 105 - self.annuitant.age
         survival_function = {0:np.float64(1)}
 
-        # Make sure to make the lastest year dynamic
         # Up to 98 YOA
         latest_year = self.baseline_mortality_df.index.get_level_values("year").max()         
         for t_delta in range(0, last_delta):
@@ -117,15 +114,18 @@ class Valuation():
             # Eurostat mortality prediction available up to 98 YOA
             if t_delta < 99-self.annuitant.age:
                 age = self.annuitant.age+t_delta
-                qx = self.baseline_mortality_df.loc[(latest_year, age, self.annuitant.sex.value), "qx"]
-                beta = self.mortality_trend.b_age_parameters[self.annuitant.sex][age] 
-                # beta = 0
-                survival_function[t_delta+1] = survival_function[t_delta] * (1- qx * np.exp(beta*t_delta))
+                base_qx = self.baseline_mortality_df.loc[(latest_year, age, self.annuitant.sex.value), "qx"]
+                beta = self.mortality_trend.b_age_parameters[self.annuitant.sex][age]
+                qx = base_qx * np.exp(beta*t_delta)
+                survival_function[t_delta+1] = survival_function[t_delta] * (1-qx)
+                # print(qx*survival_function[t_delta+1])
+
             # Using exptrapolated 98th year mortality 
             else:        
-                qx = self.baseline_mortality_df.loc[(latest_year, age, self.annuitant.sex.value), "qx"]
+                base_qx = self.baseline_mortality_df.loc[(latest_year, age, self.annuitant.sex.value), "qx"]
                 beta = self.mortality_trend.b_age_parameters[self.annuitant.sex][98] 
-                survival_function[t_delta+1] = survival_function[t_delta] * (1- qx * np.exp(beta*t_delta))
+                qx = base_qx * np.exp(beta*t_delta)
+                survival_function[t_delta+1] = survival_function[t_delta] * (1- qx)
 
         macaulay_duration_numerator = 0
         annuity_factor_PV = 0
