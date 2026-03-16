@@ -21,12 +21,6 @@ class Sex(Enum):
     TOTAL = "T"
     WEIGHTED = "W"
 
-# This dataclass provides configuration for the disocunt rates used in calculating PV of annuity
-@dataclass(frozen=True)
-class Discount:
-    discount_model: InterestRateModel
-    fixed_rate: Optional[float] = None
-    svenson_parameters: Optional[dict] = None
 
 # Finish this verification function
 def verifyDataSetValidity():    
@@ -45,5 +39,6 @@ class Config:
     DISCOUNT_CONFIG: dict
     PURCHASE_YEAR: int
     TERMINAL_AGE: int
+    SEX_TYPE: Sex
     MIN_INITIAL_AGE = 30
     MAX_INITIAL_AGE = 100

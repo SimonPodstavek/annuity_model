@@ -1,4 +1,4 @@
-from ..config.schemas import InterestRateModel, MortalityModel, Sex, Discount, verifyDataSetValidity, Config
+from ..config.schemas import InterestRateModel, MortalityModel, Sex, verifyDataSetValidity, Config
 from ..config.config import config
 from ..data_io.excel import read_xlsx
 import numpy as np
@@ -21,7 +21,7 @@ class Mortality:
         
         qx_dict = {}
 
-        age_range = config.MAX_INITIAL_AGE - config.MIN_INITIAL_AGE
+        age_range = config.TERMINAL_AGE - config.MIN_INITIAL_AGE
 
         if config.MORTALITY_MODEL == MortalityModel.FULL_MORTALITY_SURFACE:
             prediction_df = read_xlsx(config.MORTALITY_CONFIG[config.MORTALITY_MODEL]["mortality_prediction"])
@@ -33,8 +33,8 @@ class Mortality:
                     qx_lookup = mortality_df_slice.set_index(["year", "age"])["qx"]
                     for i in range(age_range + 1):
                         used_year = config.PURCHASE_YEAR + i if i < age_range +1 else config.PURCHASE_YEAR + age_range
-                        used_age = age + i  if age < config.MAX_INITIAL_AGE else config.MAX_INITIAL_AGE -1
-                        values.append(qx_lookup.loc[(used_year, age)])
+                        used_age = age + i  if age +i < config.MAX_INITIAL_AGE else config.MAX_INITIAL_AGE -1
+                        values.append(qx_lookup.loc[(used_year, used_age)])
 
                     qx_dict[sex][age] = values
 
@@ -50,8 +50,8 @@ class Mortality:
 
                     for i in range(age_range + 1):
                         used_year = config.PURCHASE_YEAR
-                        used_age = age + i if age < config.MAX_INITIAL_AGE else config.MAX_INITIAL_AGE -1
-                        values.append(qx_lookup.loc[(used_year, age)])
+                        used_age = age + i if age + i < config.MAX_INITIAL_AGE else config.MAX_INITIAL_AGE -1
+                        values.append(qx_lookup.loc[(used_year, used_age)])
 
                     qx_dict[sex][age] = values
 

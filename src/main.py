@@ -23,7 +23,7 @@ def main() -> None:
     for i, offer in enumerate(CIPS_annuity_df.itertuples(index=True), start=1):
 
         # Annuity configuration
-        annuitant = Annuitant(age = offer.age, first_payment_year=2026, present_balance=offer.mean_balance, sex=Sex.MALE)
+        annuitant = Annuitant(age = offer.age, first_payment_year=2026, present_balance=offer.mean_balance, sex=config.SEX_TYPE)
         # annuitant = Annuitant(age = 65, first_payment_year=2026, present_balance=100000, sex=Sex.WEIGHTED)
 
         valuation = Valuation(annuitant, mortality, discount)
