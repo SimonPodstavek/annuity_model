@@ -4,7 +4,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parents[2]
 
 # Step 1: Choose any of the 3 available interest rate models (ZERO, SVENSSON, FIXED) and change parameters of the respective model in DISCOUNT_CONFIG.
-DISCOUNT_MODEL = InterestRateModel.FIXED
+DISCOUNT_MODEL = InterestRateModel.SVENSSON
 
 DISCOUNT_CONFIG = {
     InterestRateModel.FIXED: {
@@ -23,7 +23,7 @@ DISCOUNT_CONFIG = {
 }
 
 # Step 2.1: This model uses one of two modes of operation for mortality prediction:
-MORTALITY_MODEL = MortalityModel.REALIZED_AND_TREND
+MORTALITY_MODEL = MortalityModel.FULL_MORTALITY_SURFACE
 
 
 # a) Full mortality surface - you provide full mortality prediction. 
@@ -37,31 +37,28 @@ MORTALITY_MODEL = MortalityModel.REALIZED_AND_TREND
 # for mode c) the latest available year will be used
 
 # Step 2.2 Update dataset paths
-DATASET_PATH = {
-    "susr_mortality_path": Path(BASE_DIR / "src/data/susr_mortality.xlsx" ),
-    "europop_mortality_path": Path(BASE_DIR / "src/data/europop_mortality.xlsx"),
-    "RRZ_mortality_path": Path(BASE_DIR / "src/data/RRZ_mortality_projection.xlsx")
-}
-   
+SUSR_MORTALITY_PATH = BASE_DIR / "src/data/susr_mortality.xlsx"
+EUROPOP_MORTALITY_PATH = BASE_DIR / "src/data/europop_mortality.xlsx"
+RRZ_MORTALITY_PATH = BASE_DIR / "src/data/RRZ_mortality_projection.xlsx"
 
 
 # Step 2.3 Update mortality config according to 2.1
 MORTALITY_CONFIG = {
-    MortalityModel.FULL_MORTALITY_SURFACE:{
-        "mortality_prediction": DATASET_PATH["RRZ_mortality_path"]
+    MortalityModel.FULL_MORTALITY_SURFACE: {
+        "mortality_prediction": RRZ_MORTALITY_PATH
     },
-    MortalityModel.CONSTANT:{
-        "realized_mortality": DATASET_PATH["susr_mortality_path"]
+    MortalityModel.CONSTANT: {
+        "realized_mortality": SUSR_MORTALITY_PATH
     },
-    MortalityModel.REALIZED_AND_TREND:{
-        "realized_mortality": DATASET_PATH["susr_mortality_path"],
-        "mortality_trend": DATASET_PATH["europop_mortality_path"]
+    MortalityModel.REALIZED_AND_TREND: {
+        "realized_mortality": SUSR_MORTALITY_PATH,
+        "mortality_trend": EUROPOP_MORTALITY_PATH
     }
 }
 
 # Step 2.4: Chooose sex type. Make sure that the sex type is available in both datasets provided (THIS IS NOT CHECKED, and if chosen sex is not available, the model WILL FAIL)
 # Check in schams.py that the encoded representation matches that of dataset (E.g. Sex.FEMALE corresponds to F, and therefore F must be in the Sex field)
-SEX_TYPE = Sex.FEMALE
+SEX_TYPE = Sex.TOTAL
 
 # Step 3: Set annuity pruchase year. (default 2026) This may differ from the year when the annuity starts paying out.
 PURCHASE_YEAR = 2026
@@ -71,14 +68,13 @@ TERMINAL_AGE = 105
 
 
 config = Config(
-    DATASET_PATH = DATASET_PATH,
-    MORTALITY_MODEL = MORTALITY_MODEL,
-    MORTALITY_CONFIG = MORTALITY_CONFIG,
-    DISCOUNT_MODEL = DISCOUNT_MODEL,
-    DISCOUNT_CONFIG = DISCOUNT_CONFIG,
-    PURCHASE_YEAR = PURCHASE_YEAR,
-    TERMINAL_AGE = TERMINAL_AGE,
-    SEX_TYPE = SEX_TYPE
+    MORTALITY_MODEL=MORTALITY_MODEL,
+    MORTALITY_CONFIG=MORTALITY_CONFIG,
+    DISCOUNT_MODEL=DISCOUNT_MODEL,
+    DISCOUNT_CONFIG=DISCOUNT_CONFIG,
+    PURCHASE_YEAR=PURCHASE_YEAR,
+    TERMINAL_AGE=TERMINAL_AGE,
+    SEX_TYPE=SEX_TYPE,
 )
 
 

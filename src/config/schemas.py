@@ -23,7 +23,7 @@ class Sex(Enum):
 
 
 # Finish this verification function
-def verifyDataSetValidity():    
+def verifyDataSetValidity() -> None:
     # min_age is the minimum age that the annuity calculation can start at
     min_initial_age = 30
     max_initial_age = 98
@@ -32,7 +32,6 @@ def verifyDataSetValidity():
 
 @dataclass()
 class Config:
-    DATASET_PATH: dict
     MORTALITY_MODEL: MortalityModel
     MORTALITY_CONFIG: dict
     DISCOUNT_MODEL: InterestRateModel

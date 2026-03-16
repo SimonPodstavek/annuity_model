@@ -90,7 +90,7 @@ def _from_realized_and_trend(config: Config, ages: range, t_count: int) -> Dict[
     with t years of trend improvement applied.
     """
     realized_df = read_xlsx(config.MORTALITY_CONFIG[MortalityModel.REALIZED_AND_TREND]["realized_mortality"])
-    trend_df    = read_xlsx(config.MORTALITY_CONFIG[MortalityModel.REALIZED_AND_TREND]["mortality_trend"])
+    trend_df = read_xlsx(config.MORTALITY_CONFIG[MortalityModel.REALIZED_AND_TREND]["mortality_trend"])
 
     switch_year = int(realized_df["year"].max())  # last SUSR year (2024)
 
@@ -100,10 +100,10 @@ def _from_realized_and_trend(config: Config, ages: range, t_count: int) -> Dict[
         beta[sex_str] = {}
         post_df = trend_df[(trend_df["sex"] == sex_str) & (trend_df["year"] > switch_year)]
         for age in ages:
-            age_df   = post_df[post_df["age"] == age].sort_values("year")
-            years    = age_df["year"].to_numpy()
-            delta    = years - years.min() + 1       # 1-indexed offset from first post-switch year
-            log_qx   = np.log(age_df["qx"].to_numpy())
+            age_df = post_df[post_df["age"] == age].sort_values("year")
+            years = age_df["year"].to_numpy()
+            delta = years - years.min() + 1       # 1-indexed offset from first post-switch year
+            log_qx = np.log(age_df["qx"].to_numpy())
             slope, _ = np.polyfit(delta, log_qx, 1)
             beta[sex_str][age] = slope
 
@@ -114,7 +114,7 @@ def _from_realized_and_trend(config: Config, ages: range, t_count: int) -> Dict[
         sex = Sex(sex_str)
         table[sex] = {}
         for age in ages:
-            base_qx  = base_lookup.loc[(switch_year, age)]
-            b        = beta[sex_str][age]
+            base_qx = base_lookup.loc[(switch_year, age)]
+            b = beta[sex_str][age]
             table[sex][age] = np.array([base_qx * exp(b * t) for t in range(t_count)])
     return table

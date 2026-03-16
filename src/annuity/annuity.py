@@ -6,7 +6,7 @@ from math import exp
 
 
 class Annuitant():
-    def __init__(self, age, first_payment_year, present_balance, sex: Sex = Sex.TOTAL):
+    def __init__(self, age: int, first_payment_year: int, present_balance: float, sex: Sex = Sex.TOTAL) -> None:
         self.age = age
         self.sex = sex
         self.first_payment_year = first_payment_year
@@ -16,15 +16,15 @@ class Annuitant():
 
 
 class Mortality:
-    def __init__(self):
+    def __init__(self) -> None:
         self.qx_dict = build_mortality_table(config)
 
 
 class Discount:
-    def __init__(self):
-        self.discount_factor_series = {}
+    def __init__(self) -> None:
+        self.discount_factor_series: dict[int, float] = {}
 
-        def calculateSvenssonInterestRate(svensson, t_delta):
+        def calculateSvenssonInterestRate(svensson: dict, t_delta: int) -> float:
             t_delta = t_delta+1
 
             if (t_delta > 30):
@@ -72,12 +72,12 @@ class Discount:
 
 
 class Valuation():
-    def __init__(self, annuitant: Annuitant, mortality: Mortality, discount: Discount):
+    def __init__(self, annuitant: Annuitant, mortality: Mortality, discount: Discount) -> None:
         self.annuitant = annuitant
         self.mortality = mortality
         self.discount = discount
 
-    def calculateAnnuityFactor(self) -> int:
+    def calculateAnnuityFactor(self) -> tuple[float, float]:
         # Survival function modeling
         initial_delta = self.annuitant.first_payment_year - config.PURCHASE_YEAR
         last_delta = config.TERMINAL_AGE - self.annuitant.age
