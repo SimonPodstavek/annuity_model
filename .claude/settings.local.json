@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c \":*)",
+      "Bash(python -c \":*)",
+      "Bash(python -m src.main)",
+      "Bash(cmd /c mklink /J \"H:\\\\My Drive\\\\RRZ\\\\annuity_model\\\\.claude\\\\worktrees\\\\elastic-hypatia\\\\src\\\\data\" \"H:\\\\My Drive\\\\RRZ\\\\annuity_model\\\\src\\\\data\")",
+      "Bash(cmd /c dir \"H:\\\\My Drive\\\\RRZ\\\\annuity_model\\\\.claude\\\\worktrees\\\\elastic-hypatia\\\\src\")",
+      "Bash(tasklist)",
+      "Bash(handle \"annuity_model\\\\.git\\\\worktrees\\\\elastic-hypatia\\\\index.lock\")",
+      "Bash(powershell -Command \"Get-Process | Where-Object {$_MainWindowTitle -like ''*git*'' -or $_Name -like ''*git*''}\")",
+      "Bash(powershell -Command \"Remove-Item -Force ''H:\\\\My Drive\\\\RRZ\\\\annuity_model\\\\.git\\\\worktrees\\\\elastic-hypatia\\\\index.lock'' -ErrorAction SilentlyContinue; Write-Host ''Done''\")"
+    ]
+  }
+}
