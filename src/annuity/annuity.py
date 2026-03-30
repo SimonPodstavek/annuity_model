@@ -61,7 +61,7 @@ class Discount:
             discount_factor = 1
             for t_delta in range(0, config.TERMINAL_AGE-30+1):
                 self.discount_factor_series[t_delta] = 1/discount_factor
-                discount_factor = discount_factor * (1 + fixed_rate)
+                discount_factor = discount_factor * (1 + fixed_rate)-
 
         # For svensson interest rate
         if config.DISCOUNT_MODEL == InterestRateModel.SVENSSON:
@@ -92,6 +92,7 @@ class Valuation():
         macaulay_duration_numerator = 0
         annuity_factor_PV = 0
 
+        # Due to guaranteed payout
         # First leg of the annuity (annuity year 1-7)
         for t_delta in range(1, 8):
             annuity_factor_PV += self.discount.discount_factor_series[t_delta]

@@ -24,7 +24,7 @@ def main() -> None:
 
         # Annuity configuration
         annuitant = Annuitant(age = offer.age, first_payment_year=2026, present_balance=offer.mean_balance, sex=config.SEX_TYPE)
-        # annuitant = Annuitant(age = 65, first_payment_year=2026, present_balance=100000, sex=Sex.WEIGHTED)
+        # annuitant = Annuitant(age = offer.age, first_payment_year=2026, present_balance=100000, sex=Sex.TOTAL)
 
         valuation = Valuation(annuitant, mortality, discount)
         annuitant.annuity_factor_adj, mod_duration = valuation.calculateAnnuityFactor()
@@ -33,13 +33,14 @@ def main() -> None:
         # Adjustment for §42a profit redistribution   
         # fair_offer /= 1.02
 
-        MWR_offers.append(round(100*(offer.mean_offer/fair_offer),2))   
+        MWR_offers.append(round(1*(offer.mean_offer/fair_offer),2))   
         # mod_duration = round(mod_duration/(1.01),2)
         
         if(i%5==0):
             # print(f"{offer.age} {offer.year}\t{mod_duration}")
             # print(f"{offer.age} {offer.year} {round(fair_offer,2)}")
-            print(f"{offer.age} {round((MWR_offers[0]+MWR_offers[4])/200,3)}")
+            print(f"{offer.age} {round((MWR_offers[0]),3)}")
+            print(f"{offer.age} {round((MWR_offers[4]),3)}")
             MWR_offers=[]
 
 

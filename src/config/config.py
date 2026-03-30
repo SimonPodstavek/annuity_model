@@ -4,7 +4,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parents[2]
 
 # Step 1: Choose any of the 3 available interest rate models (ZERO, SVENSSON, FIXED) and change parameters of the respective model in DISCOUNT_CONFIG.
-DISCOUNT_MODEL = InterestRateModel.SVENSSON
+DISCOUNT_MODEL = InterestRateModel.FIXED
 
 DISCOUNT_CONFIG = {
     InterestRateModel.FIXED: {
@@ -12,18 +12,18 @@ DISCOUNT_CONFIG = {
     },
     InterestRateModel.SVENSSON: {
             "parameters": {
-                "b0": 1.189950,
-                "b1": 0.776282,
-                "b2": -0.653820,
-                "b3": 7.321428,
-                "t1": 2.708616,
-                "t2": 16.292510
+                "b0": 1.164096,
+                "b1": 0.689967,
+                "b2": 2.443759,
+                "b3": 7.329445,
+                "t1": 0.864350,
+                "t2": 13.853053
         }
     }
 }
 
 # Step 2.1: This model uses one of two modes of operation for mortality prediction:
-MORTALITY_MODEL = MortalityModel.FULL_MORTALITY_SURFACE
+MORTALITY_MODEL = MortalityModel.REALIZED_AND_TREND
 
 
 # a) Full mortality surface - you provide full mortality prediction. 
@@ -40,6 +40,8 @@ MORTALITY_MODEL = MortalityModel.FULL_MORTALITY_SURFACE
 SUSR_MORTALITY_PATH = BASE_DIR / "src/data/susr_mortality.xlsx"
 EUROPOP_MORTALITY_PATH = BASE_DIR / "src/data/europop_mortality.xlsx"
 RRZ_MORTALITY_PATH = BASE_DIR / "src/data/RRZ_mortality_projection.xlsx"
+IRELAND_EUROPOP_MORTALITY_PATH = BASE_DIR / "src/data/ireland_full_mortality_surface.xlsx"
+
 
 
 # Step 2.3 Update mortality config according to 2.1
