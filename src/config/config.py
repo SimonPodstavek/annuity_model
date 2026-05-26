@@ -8,22 +8,22 @@ DISCOUNT_MODEL = InterestRateModel.FIXED
 
 DISCOUNT_CONFIG = {
     InterestRateModel.FIXED: {
-        "fixed_rate": 0.01
+        "fixed_rate": 0.03
     },
     InterestRateModel.SVENSSON: {
             "parameters": {
-                "b0": 1.189950,
-                "b1": 0.776282,
-                "b2": -0.653820,
-                "b3": 7.321428,
-                "t1": 2.708616,
-                "t2": 16.292510
+                "b0": 1.274524,
+                "b1": 0.686970,
+                "b2": 1.710780,
+                "b3": 7.082796,
+                "t1": 0.957513,
+                "t2": 15.889504
         }
     }
 }
 
 # Step 2.1: This model uses one of two modes of operation for mortality prediction:
-MORTALITY_MODEL = MortalityModel.REALIZED_AND_TREND
+MORTALITY_MODEL = MortalityModel.FULL_MORTALITY_SURFACE
 
 
 # a) Full mortality surface - you provide full mortality prediction. 
@@ -40,7 +40,9 @@ MORTALITY_MODEL = MortalityModel.REALIZED_AND_TREND
 DATASET_PATH = {
     "susr_mortality_path": Path(BASE_DIR / "src/data/susr_mortality.xlsx" ),
     "europop_mortality_path": Path(BASE_DIR / "src/data/europop_mortality.xlsx"),
-    "RRZ_mortality_path": Path(BASE_DIR / "src/data/RRZ_mortality_projection.xlsx")
+    "RRZ_mortality_path": Path(BASE_DIR / "src/data/RRZ_mortality_projection.xlsx"),
+    "regional_mortality_path": Path(BASE_DIR / "src/data/regional_mortality.xlsx" ),
+    "lithuania_mortality_path": Path(BASE_DIR / "src/data/lithuania_full_mortality_surface.xlsx"),
 }
    
 
@@ -48,7 +50,7 @@ DATASET_PATH = {
 # Step 2.3 Update mortality config according to 2.1
 MORTALITY_CONFIG = {
     MortalityModel.FULL_MORTALITY_SURFACE:{
-        "mortality_prediction": DATASET_PATH["RRZ_mortality_path"]
+        "mortality_prediction": DATASET_PATH["lithuania_mortality_path"]
     },
     MortalityModel.CONSTANT:{
         "realized_mortality": DATASET_PATH["susr_mortality_path"]
@@ -61,7 +63,7 @@ MORTALITY_CONFIG = {
 
 # Step 2.4: Chooose sex type. Make sure that the sex type is available in both datasets provided (THIS IS NOT CHECKED, and if chosen sex is not available, the model WILL FAIL)
 # Check in schams.py that the encoded representation matches that of dataset (E.g. Sex.FEMALE corresponds to F, and therefore F must be in the Sex field)
-SEX_TYPE = Sex.FEMALE
+SEX_TYPE = Sex.TOTAL
 
 # Step 3: Set annuity pruchase year. (default 2026) This may differ from the year when the annuity starts paying out.
 PURCHASE_YEAR = 2024
