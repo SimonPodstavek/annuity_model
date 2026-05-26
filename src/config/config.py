@@ -4,7 +4,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parents[2]
 
 # Step 1: Choose any of the 3 available interest rate models (ZERO, SVENSSON, FIXED) and change parameters of the respective model in DISCOUNT_CONFIG.
-DISCOUNT_MODEL = InterestRateModel.FIXED
+DISCOUNT_MODEL = InterestRateModel.SVENSSON
 
 DISCOUNT_CONFIG = {
     InterestRateModel.FIXED: {
@@ -66,10 +66,10 @@ MORTALITY_CONFIG = {
 SEX_TYPE = Sex.TOTAL
 
 # Step 3: Set annuity pruchase year. (default 2026) This may differ from the year when the annuity starts paying out.
-PURCHASE_YEAR = 2024
+PURCHASE_YEAR = 2026
 
 # Step 4: The maximum attainable age in the model
-TERMINAL_AGE = 105
+TERMINAL_AGE = 100
 
 
 config = Config(

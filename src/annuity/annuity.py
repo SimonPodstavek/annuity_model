@@ -100,8 +100,10 @@ class Discount:
         self.discount_factor_series = {}
         
         def calculateSvenssonInterestRate(svensson, t_delta):
-            t_delta = t_delta+1 
             
+            if (t_delta == 0):
+                return 1
+
             if (t_delta > 30):
                 t_delta = 30
             
@@ -161,20 +163,20 @@ class Valuation():
 
         for t_delta in range(0, last_delta+1):
             age = self.annuitant.age
-            used_delta = t_delta if t_delta < 100-self.annuitant.age else 99 - self.annuitant.age
+            used_delta = t_delta if t_delta < config.TERMINAL_AGE - self.annuitant.age else config.TERMINAL_AGE - self.annuitant.age - 1
             qx = self.mortality.qx_dict[self.annuitant.sex][age+used_delta][t_delta]
             survival_function[t_delta+1] = survival_function[t_delta] * (1-qx)
 
         macaulay_duration_numerator = 0
         annuity_factor_PV = 0
 
-        # First leg of the annuity (annuity year 1-7)
-        # for t_delta in range(1, 8): 
-        #     annuity_factor_PV += self.discount.discount_factor_series[t_delta] 
-        #     macaulay_duration_numerator += self.discount.discount_factor_series[t_delta] * t_delta
+        # First leg of the annuity (annuity year 1-7), with guaranteed payout for Slovak annuities
+        for t_delta in range(initial_delta, initial_delta+8): 
+            annuity_factor_PV += self.discount.discount_factor_series[t_delta] 
+            macaulay_duration_numerator += self.discount.discount_factor_series[t_delta] * t_delta
 
         # Second leg of the annuity (annuity year 7+)
-        for t_delta in range(1, last_delta+1): 
+        for t_delta in range(initial_delta + 8, last_delta+1): 
             annuity_factor_PV += survival_function[t_delta] * self.discount.discount_factor_series[t_delta] 
             macaulay_duration_numerator += survival_function[t_delta] * self.discount.discount_factor_series[t_delta] * t_delta
 
