@@ -4,26 +4,26 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parents[2]
 
 # Step 1: Choose any of the 3 available interest rate models (ZERO, SVENSSON, FIXED) and change parameters of the respective model in DISCOUNT_CONFIG.
-DISCOUNT_MODEL = InterestRateModel.FIXED
+DISCOUNT_MODEL = InterestRateModel.SVENSSON
 
 DISCOUNT_CONFIG = {
     InterestRateModel.FIXED: {
-        "fixed_rate": 0.01
+        "fixed_rate": 0.03
     },
     InterestRateModel.SVENSSON: {
             "parameters": {
-                "b0": 1.164096,
-                "b1": 0.689967,
-                "b2": 2.443759,
-                "b3": 7.329445,
-                "t1": 0.864350,
-                "t2": 13.853053
+                "b0": 1.274524,
+                "b1": 0.686970,
+                "b2": 1.710780,
+                "b3": 7.082796,
+                "t1": 0.957513,
+                "t2": 15.889504
         }
     }
 }
 
 # Step 2.1: This model uses one of two modes of operation for mortality prediction:
-MORTALITY_MODEL = MortalityModel.REALIZED_AND_TREND
+MORTALITY_MODEL = MortalityModel.FULL_MORTALITY_SURFACE
 
 
 # a) Full mortality surface - you provide full mortality prediction. 
@@ -37,24 +37,27 @@ MORTALITY_MODEL = MortalityModel.REALIZED_AND_TREND
 # for mode c) the latest available year will be used
 
 # Step 2.2 Update dataset paths
-SUSR_MORTALITY_PATH = BASE_DIR / "src/data/susr_mortality.xlsx"
-EUROPOP_MORTALITY_PATH = BASE_DIR / "src/data/europop_mortality.xlsx"
-RRZ_MORTALITY_PATH = BASE_DIR / "src/data/RRZ_mortality_projection.xlsx"
-IRELAND_EUROPOP_MORTALITY_PATH = BASE_DIR / "src/data/ireland_full_mortality_surface.xlsx"
-
+DATASET_PATH = {
+    "susr_mortality_path": Path(BASE_DIR / "src/data/susr_mortality.xlsx" ),
+    "europop_mortality_path": Path(BASE_DIR / "src/data/europop_mortality.xlsx"),
+    "RRZ_mortality_path": Path(BASE_DIR / "src/data/RRZ_mortality_projection.xlsx"),
+    "regional_mortality_path": Path(BASE_DIR / "src/data/regional_mortality.xlsx" ),
+    "lithuania_mortality_path": Path(BASE_DIR / "src/data/lithuania_full_mortality_surface.xlsx"),
+}
+   
 
 
 # Step 2.3 Update mortality config according to 2.1
 MORTALITY_CONFIG = {
-    MortalityModel.FULL_MORTALITY_SURFACE: {
-        "mortality_prediction": RRZ_MORTALITY_PATH
+    MortalityModel.FULL_MORTALITY_SURFACE:{
+        "mortality_prediction": DATASET_PATH["lithuania_mortality_path"]
     },
     MortalityModel.CONSTANT: {
-        "realized_mortality": SUSR_MORTALITY_PATH
+        "realized_mortality": DATASET_PATH["susr_mortality_path"]
     },
     MortalityModel.REALIZED_AND_TREND: {
-        "realized_mortality": SUSR_MORTALITY_PATH,
-        "mortality_trend": EUROPOP_MORTALITY_PATH
+        "realized_mortality": DATASET_PATH["susr_mortality_path"],
+        "mortality_trend": DATASET_PATH["europop_mortality_path"]
     }
 }
 
@@ -66,7 +69,7 @@ SEX_TYPE = Sex.TOTAL
 PURCHASE_YEAR = 2026
 
 # Step 4: The maximum attainable age in the model
-TERMINAL_AGE = 105
+TERMINAL_AGE = 100
 
 
 config = Config(
