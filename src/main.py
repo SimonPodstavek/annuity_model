@@ -1,5 +1,5 @@
 from pandas import DataFrame
-from .config.schemas import verifyDataSetValidity, Sex
+from .config.schemas import Sex
 from .config.config import config
 from .data_io.excel import read_xlsx
 from .annuity.annuity import Annuitant, Mortality, Discount, Valuation
@@ -8,8 +8,6 @@ from .annuity.annuity import Annuitant, Mortality, Discount, Valuation
 
 
 def main() -> None:
-    # Finish verification method
-    verifyDataSetValidity()
 
     mortality = Mortality()
     discount = Discount()
@@ -32,7 +30,7 @@ def main() -> None:
     #     print(f"{row["age"]}: MWR: {row["mean_offer"]/fair_offer}")
 
     # Annuity configuration
-    annuitant = Annuitant(age = 65, first_payment_year=2026, present_balance=100000, sex=Sex.FEMALE)
+    annuitant = Annuitant(age = 65, first_payment_year=2026, present_balance=97500, sex=Sex.TOTAL)
 
     valuation = Valuation(annuitant, mortality, discount)
     annuitant.annuity_factor_adj, mod_duration = valuation.calculateAnnuityFactor()

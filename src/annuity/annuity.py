@@ -1,4 +1,4 @@
-from ..config.schemas import InterestRateModel, MortalityModel, Sex, Discount, verifyDataSetValidity, Config
+from ..config.schemas import InterestRateModel, MortalityModel, Sex
 from ..config.config import config
 from ..data_io.excel import read_xlsx
 import numpy as np
@@ -176,7 +176,7 @@ class Valuation():
             macaulay_duration_numerator += self.discount.discount_factor_series[t_delta] * t_delta
 
         # Second leg of the annuity (annuity year 7+)
-        for t_delta in range(initial_delta + 8, last_delta+1): 
+        for t_delta in range(initial_delta + 8 , last_delta+1): 
             annuity_factor_PV += survival_function[t_delta] * self.discount.discount_factor_series[t_delta] 
             macaulay_duration_numerator += survival_function[t_delta] * self.discount.discount_factor_series[t_delta] * t_delta
 

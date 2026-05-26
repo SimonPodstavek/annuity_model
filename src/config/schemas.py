@@ -22,13 +22,6 @@ class Sex(Enum):
     WEIGHTED = "W"
 
 
-# Finish this verification function
-def verifyDataSetValidity() -> None:
-    # min_age is the minimum age that the annuity calculation can start at
-    min_initial_age = 30
-    max_initial_age = 98
-    # terminal_age is the assumed maximum attainable age
-    terminal_age = 105
 
 @dataclass()
 class Config:

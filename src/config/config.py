@@ -8,7 +8,7 @@ DISCOUNT_MODEL = InterestRateModel.SVENSSON
 
 DISCOUNT_CONFIG = {
     InterestRateModel.FIXED: {
-        "fixed_rate": 0.03
+        "fixed_rate": 0.005
     },
     InterestRateModel.SVENSSON: {
             "parameters": {
@@ -43,6 +43,7 @@ DATASET_PATH = {
     "RRZ_mortality_path": Path(BASE_DIR / "src/data/RRZ_mortality_projection.xlsx"),
     "regional_mortality_path": Path(BASE_DIR / "src/data/regional_mortality.xlsx" ),
     "lithuania_mortality_path": Path(BASE_DIR / "src/data/lithuania_full_mortality_surface.xlsx"),
+    "germany_mortality_path": Path(BASE_DIR / "src/data/germany_full_mortality_surface.xlsx"),
 }
    
 
