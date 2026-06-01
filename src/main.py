@@ -2,6 +2,8 @@ from pandas import DataFrame
 from .config.schemas import Sex
 from .config.config import config
 from .data_io.excel import read_xlsx
+from .data_io.stata import read_stata 
+
 from .annuity.annuity import Annuitant, Mortality, Discount, Valuation
 
 # Configure model parameters in config/config.py
@@ -33,13 +35,15 @@ def main() -> None:
     annuitant = Annuitant(age = 65, first_payment_year=2026, present_balance=100000, sex=Sex.TOTAL)
 
     valuation = Valuation(annuitant, mortality, discount)
+
+
     annuitant.annuity_factor_adj, mod_duration = valuation.calculateAnnuityFactor()
     fair_offer = annuitant.present_balance / (12*annuitant.annuity_factor_adj)
 
     # Adjustment for §42a profit redistribution   
-    # fair_offer /= 1.02
 
     print(fair_offer)
 
 if __name__ == "__main__":
+    df = read_stata(r"H:\My Drive\RRZ\annuity_model\src\data\priebehy_synteticke.dta")
     main()

@@ -144,6 +144,8 @@ class Discount:
             for t_delta in range(0, config.TERMINAL_AGE-30+1):
                 self.discount_factor_series[t_delta] = pow(calculateSvenssonInterestRate(config.DISCOUNT_CONFIG[InterestRateModel.SVENSSON], t_delta) ,-t_delta)    
 
+        
+
 class Valuation():
     def __init__(self, annuitant: Annuitant, mortality:Mortality, discount: Discount):
         self.annuitant = annuitant
@@ -166,9 +168,9 @@ class Valuation():
         annuity_factor_PV = 0   
 
         # First leg of the annuity (annuity year 1-7), with guaranteed payout for Slovak annuities
-        # for t_delta in range(initial_delta, initial_delta+7): 
-        #     annuity_factor_PV += self.discount.discount_factor_series[t_delta] 
-        #     macaulay_duration_numerator += self.discount.discount_factor_series[t_delta] * t_delta
+        for t_delta in range(initial_delta, initial_delta+7): 
+            annuity_factor_PV += self.discount.discount_factor_series[t_delta] 
+            macaulay_duration_numerator += self.discount.discount_factor_series[t_delta] * t_delta
 
         # Second leg of the annuity (annuity year 7+)
         for t_delta in range(initial_delta, last_delta+1): 

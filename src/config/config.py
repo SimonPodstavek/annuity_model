@@ -8,19 +8,20 @@ DISCOUNT_MODEL = InterestRateModel.SVENSSON
 
 DISCOUNT_CONFIG = {
     InterestRateModel.FIXED: {
-        "fixed_rate": 0.005
+        "fixed_rate": 0.000
     },
     InterestRateModel.SVENSSON: {
             "parameters": {
-                "b0": 1.274524,
-                "b1": 0.686970,
-                "b2": 1.710780,
-                "b3": 7.082796,
-                "t1": 0.957513,
-                "t2": 15.889504
+                "b0": 1.278278,
+                "b1": 0.675994,
+                "b2": 1.847009,
+                "b3": 7.168526,
+                "t1": 0.974988,
+                "t2": 15.774611	
         }
     }
 }
+	
 
 # Step 2.1: This model uses one of two modes of operation for mortality prediction:
 MORTALITY_MODEL = MortalityModel.FULL_MORTALITY_SURFACE
@@ -44,6 +45,7 @@ DATASET_PATH = {
     "regional_mortality_path": Path(BASE_DIR / "src/data/regional_mortality.xlsx" ),
     "lithuania_mortality_path": Path(BASE_DIR / "src/data/lithuania_full_mortality_surface.xlsx"),
     "germany_mortality_path": Path(BASE_DIR / "src/data/germany_full_mortality_surface.xlsx"),
+    "latvia_mortality_path": Path(BASE_DIR / "src/data/latvia_full_mortality_surface.xlsx"),
 }
    
 
@@ -51,7 +53,7 @@ DATASET_PATH = {
 # Step 2.3 Update mortality config according to 2.1
 MORTALITY_CONFIG = {
     MortalityModel.FULL_MORTALITY_SURFACE:{
-        "mortality_prediction": DATASET_PATH["lithuania_mortality_path"]
+        "mortality_prediction": DATASET_PATH["latvia_mortality_path"]
     },
     MortalityModel.CONSTANT: {
         "realized_mortality": DATASET_PATH["susr_mortality_path"]
