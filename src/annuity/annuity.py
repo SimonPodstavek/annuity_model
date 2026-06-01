@@ -2,7 +2,7 @@ from ..config.schemas import InterestRateModel, MortalityModel, Sex
 from ..config.config import config
 from ..data_io.excel import read_xlsx
 import numpy as np
-from math import exp
+from math import exp, pow
 
 
 class Annuitant():
@@ -135,19 +135,14 @@ class Discount:
                 fixed_rate = config.DISCOUNT_CONFIG[InterestRateModel.FIXED]["fixed_rate"]
             if config.DISCOUNT_MODEL == InterestRateModel.ZERO:
                 fixed_rate = 0
-
-            discount_factor = 1
             for t_delta in range(0, config.TERMINAL_AGE-30+1):
-                self.discount_factor_series[t_delta] = 1/discount_factor
-                discount_factor = discount_factor * (1 + fixed_rate)        
+                self.discount_factor_series[t_delta] = pow(1 + fixed_rate,-t_delta)         
 
 
         # For svensson interest rate
         if config.DISCOUNT_MODEL == InterestRateModel.SVENSSON:
-            discount_factor = 1
             for t_delta in range(0, config.TERMINAL_AGE-30+1):
-                self.discount_factor_series[t_delta] = 1/discount_factor
-                discount_factor = discount_factor * calculateSvenssonInterestRate(config.DISCOUNT_CONFIG[InterestRateModel.SVENSSON], t_delta)        
+                self.discount_factor_series[t_delta] = pow(calculateSvenssonInterestRate(config.DISCOUNT_CONFIG[InterestRateModel.SVENSSON], t_delta) ,-t_delta)    
 
 class Valuation():
     def __init__(self, annuitant: Annuitant, mortality:Mortality, discount: Discount):
@@ -171,12 +166,12 @@ class Valuation():
         annuity_factor_PV = 0   
 
         # First leg of the annuity (annuity year 1-7), with guaranteed payout for Slovak annuities
-        for t_delta in range(initial_delta, initial_delta+8): 
-            annuity_factor_PV += self.discount.discount_factor_series[t_delta] 
-            macaulay_duration_numerator += self.discount.discount_factor_series[t_delta] * t_delta
+        # for t_delta in range(initial_delta, initial_delta+7): 
+        #     annuity_factor_PV += self.discount.discount_factor_series[t_delta] 
+        #     macaulay_duration_numerator += self.discount.discount_factor_series[t_delta] * t_delta
 
         # Second leg of the annuity (annuity year 7+)
-        for t_delta in range(initial_delta + 8 , last_delta+1): 
+        for t_delta in range(initial_delta, last_delta+1): 
             annuity_factor_PV += survival_function[t_delta] * self.discount.discount_factor_series[t_delta] 
             macaulay_duration_numerator += survival_function[t_delta] * self.discount.discount_factor_series[t_delta] * t_delta
 
