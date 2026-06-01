@@ -32,7 +32,7 @@ def main() -> None:
     #     print(f"{row["age"]}: MWR: {row["mean_offer"]/fair_offer}")
 
     # Annuity configuration
-    annuitant = Annuitant(age = 65, first_payment_year=2026, present_balance=100000, sex=Sex.TOTAL)
+    annuitant = Annuitant(age = 65, first_payment_year=2026, present_balance=100000, sex=config.SEX_TYPE)
 
     valuation = Valuation(annuitant, mortality, discount)
 

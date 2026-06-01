@@ -173,7 +173,7 @@ class Valuation():
             macaulay_duration_numerator += self.discount.discount_factor_series[t_delta] * t_delta
 
         # Second leg of the annuity (annuity year 7+)
-        for t_delta in range(initial_delta, last_delta+1): 
+        for t_delta in range(initial_delta+7, last_delta+1): 
             annuity_factor_PV += survival_function[t_delta] * self.discount.discount_factor_series[t_delta] 
             macaulay_duration_numerator += survival_function[t_delta] * self.discount.discount_factor_series[t_delta] * t_delta
 
