@@ -56,10 +56,6 @@ MORTALITY_CONFIG = {
     },
     MortalityModel.CONSTANT: {
         "realized_mortality": DATASET_PATH["susr_mortality_path"]
-    },
-    MortalityModel.REALIZED_AND_TREND: {
-        "realized_mortality": DATASET_PATH["susr_mortality_path"],
-        "mortality_prediction": DATASET_PATH["europop_mortality_path"]
     }
 }
 
@@ -67,23 +63,14 @@ MORTALITY_CONFIG = {
 # Check in schams.py that the encoded representation matches that of dataset (E.g. Sex.FEMALE corresponds to F, and therefore F must be in the Sex field)
 SEX_TYPE = Sex.TOTAL
 
-# Step 3: Set annuity pruchase year. (default 2026) This may differ from the year when the annuity starts paying out.
-
-# Step 4: The maximum attainable age within the model in months (1188 = 99 years)
+# Step 3: Set annuity pruchase year. (default 2026) This is also the time when the annuity the annuity starts paying out (no deferred annuities).
 BASE_YEAR = 2026
 
-# 0-based indexing 0 = January,...,11 = December
-BASE_MONTH = 0
-
-# 99 years of ife
-TERMINAL_AGE_MONTHS = 1188
-
-# 30 years of life - Serves just to limit user input
-MIN_INITIAL_AGE_MONTHS = 360
-
-# 90 years of life - Serves just to limit user input
-MAX_INITIAL_AGE_MONTHS = 1080
-
+# Age range for time tables. Do not change these unless time rnage has changes in the life tables themselves
+# 99 years of life - Used as range for computing life table
+AGE_START_MONTHS = 360 #360 = 30 years 0 months (inclusive)
+# 30 years of life - Used as range for computing life table
+AGE_END_MONTHS = 1200 #1200 = 100 years 0 months (exclusive)
 
 config = Config(
     MORTALITY_MODEL=MORTALITY_MODEL,
@@ -91,10 +78,9 @@ config = Config(
     DISCOUNT_MODEL=DISCOUNT_MODEL,
     DISCOUNT_CONFIG=DISCOUNT_CONFIG,
     BASE_YEAR = BASE_YEAR,
-    BASE_MONTH = BASE_MONTH,
-    TERMINAL_AGE_MONTHS = TERMINAL_AGE_MONTHS,
-    MIN_INITIAL_AGE_MONTHS = MIN_INITIAL_AGE_MONTHS,
-    MAX_INITIAL_AGE_MONTHS = MAX_INITIAL_AGE_MONTHS,
+    AGE_START_MONTHS = AGE_START_MONTHS,
+    AGE_END_MONTHS = AGE_END_MONTHS,
+
     
 )
 

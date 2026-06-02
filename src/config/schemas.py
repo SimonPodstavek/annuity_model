@@ -29,15 +29,13 @@ class Config:
     DISCOUNT_MODEL: InterestRateModel
     DISCOUNT_CONFIG: dict
     BASE_YEAR: int
-    BASE_MONTH: int
-    TERMINAL_AGE_MONTHS:int
-    MIN_INITIAL_AGE_MONTHS:int
-    MAX_INITIAL_AGE_MONTHS:int
+    AGE_START_MONTHS: int
+    AGE_END_MONTHS: int 
 
 
-
-# For t = 0 -> qx (probability of dying) for monthly interval [PURCHASE_YEAR MONTH 0, PURCHASE_YEAR MONTH 1]
-# i.e. qx[t] is the probability of sying DURING month t
-# Count start from the moment of purchase (inclusive). E.g. if annuity is purchased 20/12/2025, then t=0 is December 2025 and t=1 is January 2026
-# Survival from annity purchase until month T = product of (1-qx[s]) for s in 0,...,T-1 
+# Mortality table measure the probability of dying in a monthly interval
+# For t = 0 -> qx (probability of dying) in a month [PURCHASE_YEAR MONTH  0, PURCHASE_YEAR MONTH 1]
+# i.e. qx[t] is the probability of dying DURING month t
+# The first KVP (Sex - Dict) defines sex specific mortality within the dataset, as mortality for multiple sexes may be available
+# The second KVP is (int, ndarray) identifies mortality in a given year (ndarray) for age in months (int)
 MortalityTable = Dict[Sex, Dict[int, ndarray]]
