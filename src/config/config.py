@@ -1,16 +1,16 @@
-from .schemas import Config, InterestRateModel, MortalityModel, Sex
+from .schemas import Config, DiscountModel, MortalityModel, PricingModel,  Sex
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parents[2]
 
 # Step 1: Choose any of the 3 available interest rate models (ZERO, SVENSSON, FIXED) and change parameters of the respective model in DISCOUNT_CONFIG.
-DISCOUNT_MODEL = InterestRateModel.SVENSSON
+DISCOUNT_MODEL = DiscountModel.FIXED
 
 DISCOUNT_CONFIG = {
-    InterestRateModel.FIXED: {
-        "fixed_rate": 0.000
+    DiscountModel.FIXED: {
+        "fixed_rate": 0.05
     },
-    InterestRateModel.SVENSSON: {
+    DiscountModel.SVENSSON: {
             "parameters": {
                 "b0": 1.278278,
                 "b1": 0.675994,
@@ -67,22 +67,24 @@ SEX_TYPE = Sex.TOTAL
 BASE_YEAR = 2026
 
 # Age range for time tables. Do not change these unless time rnage has changes in the life tables themselves
-# 99 years of life - Used as range for computing life table
-AGE_START_MONTHS = 360 #360 = 30 years 0 months (inclusive)
 # 30 years of life - Used as range for computing life table
+AGE_START_MONTHS = 360 #360 = 30 years 0 months (inclusive)
+# 99 years of life - Used as range for computing life table
 AGE_END_MONTHS = 1200 #1200 = 100 years 0 months (exclusive)
+
+# Step 4: Choose the mode of the tool - calculate annuity / calculate MWR
+
+PRICING_MODEL = PricingModel.VALUE
 
 config = Config(
     MORTALITY_MODEL=MORTALITY_MODEL,
     MORTALITY_CONFIG=MORTALITY_CONFIG,
     DISCOUNT_MODEL=DISCOUNT_MODEL,
     DISCOUNT_CONFIG=DISCOUNT_CONFIG,
+    PRICING_MODEL = PRICING_MODEL,
     BASE_YEAR = BASE_YEAR,
     AGE_START_MONTHS = AGE_START_MONTHS,
     AGE_END_MONTHS = AGE_END_MONTHS,
 
     
 )
-
-
-

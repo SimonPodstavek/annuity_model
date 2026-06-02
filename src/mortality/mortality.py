@@ -3,7 +3,8 @@ from ..config.schemas import MortalityModel, MortalityTable, Sex
 from ..data_io import read_xlsx
 import numpy as np
 
-
+# def build_survival_factors(mortality_table: MortalityModel, sex:Sex):
+    
 
 
 def build_mortality_table() -> MortalityTable: 

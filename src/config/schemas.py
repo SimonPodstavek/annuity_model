@@ -5,7 +5,7 @@ from typing import Dict
 
 
 # This Enum provides data source for the model 
-class InterestRateModel(str, Enum):
+class DiscountModel(str, Enum):
     FIXED = "FIXED"
     SVENSSON = "SVENSSON"
 
@@ -21,21 +21,26 @@ class Sex(Enum):
     WEIGHTED = "W"
 
 
+class PricingModel(Enum):
+    MWR = "MWR"
+    VALUE = "VALUE"
+
+
 
 @dataclass
 class Config:
     MORTALITY_MODEL: MortalityModel
     MORTALITY_CONFIG: dict
-    DISCOUNT_MODEL: InterestRateModel
+    DISCOUNT_MODEL: DiscountModel
     DISCOUNT_CONFIG: dict
+    PRICING_MODEL: PricingModel
     BASE_YEAR: int
     AGE_START_MONTHS: int
     AGE_END_MONTHS: int 
 
 
-# Mortality table measure the probability of dying in a monthly interval
-# For t = 0 -> qx (probability of dying) in a month [PURCHASE_YEAR MONTH  0, PURCHASE_YEAR MONTH 1]
-# i.e. qx[t] is the probability of dying DURING month t
-# The first KVP (Sex - Dict) defines sex specific mortality within the dataset, as mortality for multiple sexes may be available
-# The second KVP is (int, ndarray) identifies mortality in a given year (ndarray) for age in months (int)
+# MortalityTable[sex][age_months] -> ndarray of length n_years
+# ndarray[t] = annual qx for calendar year (BASE_YEAR + t)
+# age_months: AGE_START_MONTHS to AGE_END_MONTHS - 1 (360..1199 = 30y0m to 99y11m)
+# Months within the same integer age share the same qx — mortality data is annual.
 MortalityTable = Dict[Sex, Dict[int, ndarray]]
