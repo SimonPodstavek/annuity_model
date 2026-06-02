@@ -1,18 +1,22 @@
 from pandas import DataFrame
-from .config.schemas import Sex
+from .config.schemas import Sex, MortalityTable
 from .config.config import config
 from .data_io.excel import read_xlsx
 from .data_io.stata import read_stata 
 
-from .annuity.annuity import Annuitant, Mortality, Discount, Valuation
+# from .annuity.annuity import Annuitant, Mortality, Discount, Valuation
+
+
+from .mortality.mortality import build_mortality_table
 
 # Configure model parameters in config/config.py
 
 
 def main() -> None:
-
-    mortality = Mortality()
-    discount = Discount()
+    
+    mortality_table:MortalityTable = build_mortality_table()
+    print(1)
+    # discount = Discount()
 
     # df = read_xlsx(r"src/data/agregaty.xlsx", "data2")
     # df = df[df["year"] == 2025]
@@ -21,7 +25,7 @@ def main() -> None:
 
     #     # Annuity configuration
     #     annuitant = Annuitant(age = int(row["age"]), first_payment_year=2026, present_balance=row["mean_balance"], sex=Sex.TOTAL)
-
+    
     #     valuation = Valuation(annuitant, mortality, discount)
     #     annuitant.annuity_factor_adj, mod_duration = valuation.calculateAnnuityFactor()
     #     fair_offer = annuitant.present_balance / (12*annuitant.annuity_factor_adj)
@@ -45,5 +49,4 @@ def main() -> None:
     print(fair_offer)
 
 if __name__ == "__main__":
-    df = read_stata(r"H:\My Drive\RRZ\annuity_model\src\data\priebehy_synteticke.dta")
     main()
