@@ -11,7 +11,6 @@ class DiscountModel(str, Enum):
 
 class MortalityModel(str, Enum):
     FULL_MORTALITY_SURFACE = "MORTALITY_SURFACE"
-    REALIZED_AND_TREND = "REALIZED_&_TREND"
     CONSTANT = "CONSTANT"
 
 class Sex(Enum):
@@ -36,7 +35,8 @@ class Config:
     PRICING_MODEL: PricingModel
     BASE_YEAR: int
     AGE_START_MONTHS: int
-    AGE_END_MONTHS: int 
+    AGE_END_MONTHS: int
+    GUARANTEE_84_MONTHS: bool
 
 
 # MortalityTable[sex][age_months] -> ndarray of length n_years

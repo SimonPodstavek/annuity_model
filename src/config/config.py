@@ -8,16 +8,27 @@ DISCOUNT_MODEL = DiscountModel.FIXED
 
 DISCOUNT_CONFIG = {
     DiscountModel.FIXED: {
-        "fixed_rate": 0.05
+        "fixed_rate": 0.00
     },
+    # DiscountModel.SVENSSON: {
+    #         "parameters": {
+    #             "b0": 1.278278,
+    #             "b1": 0.675994,
+    #             "b2": 1.847009,
+    #             "b3": 7.168526,
+    #             "t1": 0.974988,
+    #             "t2": 15.774611	
+    #     }
+    # }
+
     DiscountModel.SVENSSON: {
             "parameters": {
-                "b0": 1.278278,
-                "b1": 0.675994,
-                "b2": 1.847009,
-                "b3": 7.168526,
-                "t1": 0.974988,
-                "t2": 15.774611	
+                "b0": 0.904845,
+                "b1": 0.977872,
+                "b2": -0.741577,
+                "b3": 6.815022,
+                "t1": 1.901189,
+                "t2": 12.568325	
         }
     }
 }
@@ -73,8 +84,10 @@ AGE_START_MONTHS = 360 #360 = 30 years 0 months (inclusive)
 AGE_END_MONTHS = 1200 #1200 = 100 years 0 months (exclusive)
 
 # Step 4: Choose the mode of the tool - calculate annuity / calculate MWR
+PRICING_MODEL = PricingModel.MWR
 
-PRICING_MODEL = PricingModel.VALUE
+# Step 5: Choose whether to take into account 7 year guarantee as defined in § 32 of 43/2004
+GUARANTEE_84_MONTHS = True
 
 config = Config(
     MORTALITY_MODEL=MORTALITY_MODEL,
@@ -85,6 +98,6 @@ config = Config(
     BASE_YEAR = BASE_YEAR,
     AGE_START_MONTHS = AGE_START_MONTHS,
     AGE_END_MONTHS = AGE_END_MONTHS,
-
+    GUARANTEE_84_MONTHS = GUARANTEE_84_MONTHS,
     
 )

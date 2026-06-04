@@ -5,7 +5,7 @@ import numpy as np
 from numpy import ndarray
 from math import exp, pow
 
-def build_discount_factors() -> Dict[int, ndarray]: 
+def build_discount_factors() -> ndarray: 
     period_months = config.AGE_END_MONTHS - config.AGE_START_MONTHS
     
     if config.DISCOUNT_MODEL == DiscountModel.SVENSSON:
@@ -16,8 +16,8 @@ def build_discount_factors() -> Dict[int, ndarray]:
         raise ValueError(f"Unknown discount model: {config.DISCOUNT_MODELs}")
 
 
-def from_svensson(period_months:int) -> Dict[int, ndarray]:
-    discount_factor_series = {}
+def from_svensson(period_months:int) -> ndarray:
+    discount_factor_series = np.zeros(period_months)
     period_years = period_months//12
 
     for i, t_delta in enumerate(np.linspace(0,period_years,period_months)):
@@ -26,8 +26,8 @@ def from_svensson(period_months:int) -> Dict[int, ndarray]:
     return discount_factor_series
 
 
-def fixed_yield(period_months:int) -> Dict[int, ndarray]:
-    discount_factor_series = {}
+def fixed_yield(period_months:int) -> ndarray:
+    discount_factor_series = np.zeros(period_months)
     period_years = period_months//12
 
     for i, t_delta in enumerate(np.linspace(0,period_years,period_months)):
