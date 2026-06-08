@@ -3,6 +3,7 @@ from .config.schemas import Sex, MortalityTable, PricingModel
 from .config.config import config
 from .data_io.excel import read_xlsx
 from typing import Dict
+from pathlib import Path
 from numpy import ndarray
 from .mortality.mortality import build_mortality_table, build_survival_factors
 from .discount.discount import build_discount_factors
@@ -18,7 +19,8 @@ def main() -> None:
 
     if config.PRICING_MODEL == PricingModel.MWR:
         pass
-        df = read_xlsx(r"src/data/agregaty.xlsx", "data2")
+        aggregates_path = Path("data/agregaty.xlsx")
+        df = read_xlsx(aggregates_path, "data2")
         df = df[df["year"] == 2025]
 
         for index, row in df.iterrows():
@@ -34,7 +36,7 @@ def main() -> None:
 
     if config.PRICING_MODEL == PricingModel.VALUE:
         # Annuity configuration
-        annuitant = Annuitant(age_years = 74, age_months = 3, first_payment_year=2025, present_balance=17967, sex=Sex.TOTAL)
+        annuitant = Annuitant(age_years = 75, age_months = 6, first_payment_year=2025, present_balance=17967, sex=Sex.TOTAL)
     
         survival_factors: ndarray = build_survival_factors(annuitant = annuitant, mortality_table = mortality_table)
         valuation = Valuation(annuitant, survival_factors , discount_factors)

@@ -1,5 +1,6 @@
 from ..config.config import config
 from ..config.schemas import DiscountModel
+from ..data_io.numpy import read_numpy
 from typing import Dict
 import numpy as np
 from numpy import ndarray
@@ -8,22 +9,21 @@ from math import exp, pow
 def build_discount_factors() -> ndarray: 
     period_months = config.AGE_END_MONTHS - config.AGE_START_MONTHS
     
-    if config.DISCOUNT_MODEL == DiscountModel.SVENSSON:
-        return from_svensson(period_months)
+
+    if config.DISCOUNT_MODEL == DiscountModel.FULL_DISCOUNT_SERIES:
+        return discount_series(period_months)
     if config.DISCOUNT_MODEL == DiscountModel.FIXED:
         return fixed_yield(period_months)
+    if config.DISCOUNT_MODEL == DiscountModel.SVENSSON:
+        return from_svensson(period_months)
     else:
-        raise ValueError(f"Unknown discount model: {config.DISCOUNT_MODELs}")
+        raise ValueError(f"Unknown discount model: {config.DISCOUNT_MODEL}")
 
 
-def from_svensson(period_months:int) -> ndarray:
-    discount_factor_series = np.zeros(period_months)
-    period_years = period_months//12
 
-    for i, t_delta in enumerate(np.linspace(0,period_years,period_months)):
-        coefficient = pow(calculateSvenssonInterestRate(config.DISCOUNT_CONFIG[DiscountModel.SVENSSON],t_delta),-t_delta) 
-        discount_factor_series[i] = coefficient
-    return discount_factor_series
+def discount_series(period_months:int) -> ndarray:
+    cluster_yields = read_numpy(config.DISCOUNT_CONFIG[DiscountModel.FULL_DISCOUNT_SERIES]["discount_series_path"])
+    return cluster_yields
 
 
 def fixed_yield(period_months:int) -> ndarray:
@@ -35,6 +35,15 @@ def fixed_yield(period_months:int) -> ndarray:
         discount_factor_series[i] = coefficient
     return discount_factor_series
 
+
+def from_svensson(period_months:int) -> ndarray:
+    discount_factor_series = np.zeros(period_months)
+    period_years = period_months//12
+
+    for i, t_delta in enumerate(np.linspace(0,period_years,period_months)):
+        coefficient = pow(calculateSvenssonInterestRate(config.DISCOUNT_CONFIG[DiscountModel.SVENSSON],t_delta),-t_delta) 
+        discount_factor_series[i] = coefficient
+    return discount_factor_series
 
 def calculateSvenssonInterestRate(svensson, t_delta):
     if (t_delta == 0):

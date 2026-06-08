@@ -22,7 +22,7 @@ class Valuation:
         self.survival_factors = survival_factors
         self.discount_factors = discount_factors
 
-    def calculateAnnuityFactor(self) -> int:
+    def calculateAnnuityFactor(self) -> tuple[float, float]:
         # Survival function modeling 
         macaulay_duration_numerator = 0
         annuity_factor_PV = 0   

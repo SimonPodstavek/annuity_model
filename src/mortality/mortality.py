@@ -5,7 +5,7 @@ import numpy as np
 from ..annuity.annuity import Annuitant
 from math import ceil
 
-def build_survival_factors(annuitant: Annuitant, mortality_table: MortalityModel):
+def build_survival_factors(annuitant: Annuitant, mortality_table: MortalityTable):
     time_span = config.AGE_END_MONTHS - annuitant.initial_month_age 
 
     initial_year = annuitant.first_payment_year
@@ -19,7 +19,7 @@ def build_survival_factors(annuitant: Annuitant, mortality_table: MortalityModel
         t = annuitant.initial_month_age + i
         year_delta = i//12
           
-        sx = sx * (1-age_specific_mortality_table[t][year_delta])
+        sx = sx * (1-age_specific_mortality_table[t][year_delta]*0.68)
         survival_factors[i] = sx
     return survival_factors 
 
@@ -40,6 +40,8 @@ def from_full_surface(ages: range, year_range:range) -> MortalityTable:
     table = {}
     df = read_xlsx(config.MORTALITY_CONFIG[MortalityModel.FULL_MORTALITY_SURFACE]["mortality_prediction"])
 
+    age_specific_mortalities = None
+
     for sex_str in df["sex"].unique():
         sex = Sex(sex_str)
         table[sex] = {}
@@ -58,6 +60,7 @@ def from_constant(ages: range, year_range:range) -> MortalityTable:
     table = {}
     df = read_xlsx(config.MORTALITY_CONFIG[MortalityModel.CONSTANT]["realized_mortality"])
     latest_year = df["year"].max()
+    constant_age_specific_mortality = None
 
     for sex_str in df["sex"].unique():
         sex = Sex(sex_str)

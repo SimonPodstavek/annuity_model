@@ -4,32 +4,36 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parents[2]
 
 # Step 1: Choose any of the 3 available interest rate models (ZERO, SVENSSON, FIXED) and change parameters of the respective model in DISCOUNT_CONFIG.
-DISCOUNT_MODEL = DiscountModel.FIXED
+DISCOUNT_MODEL = DiscountModel.FULL_DISCOUNT_SERIES
 
 DISCOUNT_CONFIG = {
     DiscountModel.FIXED: {
         "fixed_rate": 0.00
     },
-    # DiscountModel.SVENSSON: {
-    #         "parameters": {
-    #             "b0": 1.278278,
-    #             "b1": 0.675994,
-    #             "b2": 1.847009,
-    #             "b3": 7.168526,
-    #             "t1": 0.974988,
-    #             "t2": 15.774611	
-    #     }
-    # }
-
     DiscountModel.SVENSSON: {
             "parameters": {
-                "b0": 0.904845,
-                "b1": 0.977872,
-                "b2": -0.741577,
-                "b3": 6.815022,
-                "t1": 1.901189,
-                "t2": 12.568325	
+                "b0": 1.278278,
+                "b1": 0.675994,
+                "b2": 1.847009,
+                "b3": 7.168526,
+                "t1": 0.974988,
+                "t2": 15.774611	
         }
+    },
+
+    # 2025
+    # DiscountModel.SVENSSON: {
+    #         "parameters": {
+    #             "b0": 0.904845,
+    #             "b1": 0.977872,
+    #             "b2": -0.741577,
+    #             "b3": 6.815022,
+    #             "t1": 1.901189,
+    #             "t2": 12.568325	
+    #     }
+    # }
+    DiscountModel.FULL_DISCOUNT_SERIES: {
+        "discount_series_path": Path(BASE_DIR / "data/cluster_yields.npy" )
     }
 }
 	
@@ -50,13 +54,14 @@ MORTALITY_MODEL = MortalityModel.CONSTANT
 
 # Step 2.2 Update dataset paths
 DATASET_PATH = {
-    "susr_mortality_path": Path(BASE_DIR / "src/data/susr_mortality.xlsx" ),
-    "europop_mortality_path": Path(BASE_DIR / "src/data/europop_mortality.xlsx"),
-    "RRZ_mortality_path": Path(BASE_DIR / "src/data/RRZ_mortality_projection.xlsx"),
-    "regional_mortality_path": Path(BASE_DIR / "src/data/regional_mortality.xlsx" ),
-    "lithuania_mortality_path": Path(BASE_DIR / "src/data/lithuania_full_mortality_surface.xlsx"),
-    "germany_mortality_path": Path(BASE_DIR / "src/data/germany_full_mortality_surface.xlsx"),
-    "latvia_mortality_path": Path(BASE_DIR / "src/data/latvia_full_mortality_surface.xlsx"),
+    "susr_mortality_path": Path(BASE_DIR / "data/susr_mortality.xlsx" ),
+    "europop_mortality_path": Path(BASE_DIR / "data/europop_mortality.xlsx"),
+    "RRZ_mortality_path": Path(BASE_DIR / "data/RRZ_mortality_projection.xlsx"),
+    "regional_mortality_path": Path(BASE_DIR / "data/regional_mortality.xlsx" ),
+    "lithuania_mortality_path": Path(BASE_DIR / "data/foreign/lithuania_full_mortality_surface.xlsx"),
+    "germany_mortality_path": Path(BASE_DIR / "data/foreign/germany_full_mortality_surface.xlsx"),
+    "latvia_mortality_path": Path(BASE_DIR / "data/foreign/latvia_full_mortality_surface.xlsx"),
+    "ireland_mortality_path": Path(BASE_DIR / "data/foreign/ireland_full_mortality_surface.xlsx"),
 }
 
 

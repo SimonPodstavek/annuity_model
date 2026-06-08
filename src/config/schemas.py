@@ -8,6 +8,7 @@ from typing import Dict
 class DiscountModel(str, Enum):
     FIXED = "FIXED"
     SVENSSON = "SVENSSON"
+    FULL_DISCOUNT_SERIES = "FULL_DISCOUNT_SERIES"
 
 class MortalityModel(str, Enum):
     FULL_MORTALITY_SURFACE = "MORTALITY_SURFACE"
