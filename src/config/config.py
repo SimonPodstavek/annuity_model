@@ -3,7 +3,33 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parents[2]
 
+FEATURES = ["sex", "regional_mortality", "selection_bias", "fixed_fee", "duration_mismatch", "excess_return_payout", "84_month_guarantee"]
 
+# Values in real scenario
+ACTUAL = {
+    "sex": Sex.TOTAL,
+    "regional_mortality": (Path(BASE_DIR / "data/mortality/RRZ_mortality_projection.xlsx")),
+    "selection_bias": 0.68,
+    "fixed_fee": None,
+    "duration_mismatch": None,
+    "excess_return_payout": None,
+    "guarantee_84_months": True
+}
+
+
+# Values in ideal scenario
+BENCHMARK = {
+    "sex": Sex.MALE,
+    "regional_mortality": Path(BASE_DIR / "data/mortality/RRZ_mortality_projection.xlsx"),
+    "selection_bias": 1,
+    "fixed_fee": None,
+    "duration_mismatch": None,
+    "excess_return_payout": None,
+    "guarantee_84_months": False
+}
+
+def build_config():
+    pass
 
 # Step 1: Choose any of the 3 available interest rate models (ZERO, SVENSSON, FIXED) and change parameters of the respective model in DISCOUNT_CONFIG.
 DISCOUNT_MODEL = DiscountModel.FIXED
@@ -11,7 +37,7 @@ DISCOUNT_MODEL = DiscountModel.FIXED
 DISCOUNT_CONFIG = {
     DiscountModel.FIXED: {
         # "fixed_rate": -0.0075
-        "fixed_rate": 0.00
+        "fixed_rate": 0.01
     },
 
     # 2025
@@ -32,7 +58,7 @@ DISCOUNT_CONFIG = {
 	
 
 # Step 2.1: This model uses one of two modes of operation for mortality prediction:
-MORTALITY_MODEL = MortalityModel.CONSTANT
+MORTALITY_MODEL = MortalityModel.FULL_MORTALITY_SURFACE
 
 
 # a) Full mortality surface - you provide full mortality prediction. 
@@ -81,10 +107,14 @@ AGE_START_MONTHS = 360 #360 = 30 years 0 months (inclusive)
 AGE_END_MONTHS = 1200 #1200 = 100 years 0 months (exclusive)
 
 # Step 4: Choose the mode of the tool - calculate annuity / calculate MWR
-PRICING_MODEL = PricingModel.VALUE
+PRICING_MODEL = PricingModel.MWR
 
 # Step 5: Choose whether to take into account 7 year guarantee as defined in § 32 of 43/2004
 GUARANTEE_84_MONTHS = True
+
+# Step 6: Set the relative mortality of annuitant in relation to the general population 
+RELATIVE_MORTALITY = 0.68
+
 
 config = Config(
     MORTALITY_MODEL=MORTALITY_MODEL,
@@ -97,5 +127,6 @@ config = Config(
     AGE_END_MONTHS = AGE_END_MONTHS,
     SEX = SEX ,
     GUARANTEE_84_MONTHS = GUARANTEE_84_MONTHS,
+    RELATIVE_MORTALITY = RELATIVE_MORTALITY
     
 )

@@ -9,7 +9,7 @@ from .mortality.mortality import build_mortality_table, build_survival_factors
 from .discount.discount import build_discount_factors
 from .annuity.annuity import Annuitant, Valuation
 
-from .helpers.convertor import generateRegionalGenderSpecificMortalityTables
+# from .helpers.convertor import generateRegionalGenderSpecificMortalityTables
 
 # Configure model parameters in config/config.py
 
@@ -34,7 +34,7 @@ def main() -> None:
             annuity_factor_PV, modified_duration = valuation.calculateAnnuityFactor()
             fair_offer = annuitant.present_balance / annuity_factor_PV
 
-            print(f"{row["age"]}: Offer: {row["mean_balance"]}  MWR: {row["mean_offer"]/fair_offer} mod.dur: {modified_duration}")
+            print(f"Age: {row["age"]} Balance: {row["mean_balance"]}  MWR: {row["mean_offer"]/fair_offer}")
 
     if config.PRICING_MODEL == PricingModel.VALUE:
         # Annuity configuration
@@ -48,5 +48,4 @@ def main() -> None:
             print(f"{fair_offer}")
 
 if __name__ == "__main__":
-    generateRegionalGenderSpecificMortalityTables()
     main()

@@ -39,6 +39,7 @@ class Config:
     AGE_END_MONTHS: int
     SEX: Sex
     GUARANTEE_84_MONTHS: bool
+    RELATIVE_MORTALITY: float
 
 
 # MortalityTable[sex][age_months] -> ndarray of length n_years

@@ -19,8 +19,9 @@ def build_survival_factors(annuitant: Annuitant, mortality_table: MortalityTable
         t = annuitant.initial_month_age + i
         year_delta = i//12
           
-        # sx = sx * (1-age_specific_mortality_table[t][year_delta]*0.68)
-        sx = sx * (1-age_specific_mortality_table[t][year_delta]*0.68)
+
+        qx = age_specific_mortality_table[t][year_delta] * config.RELATIVE_MORTALITY
+        sx = sx * (1-qx)
 
         survival_factors[i] = sx
     return survival_factors 
@@ -51,14 +52,14 @@ def from_full_surface(ages: range, year_range:range) -> MortalityTable:
             if age % 12 == 0:
                 age_year = age // 12
                 age_specific_mortalities =  df[(df["sex"] == sex_str) & (df["age"] == age_year) & (df["year"].isin(year_range)) ].sort_values("year")["qx"].to_numpy()
+
                 # Assume uniform distribution of Deaths within a year and adjust to monthly mortality 
-                age_specific_mortalities /= 12
+                age_specific_mortalities = age_specific_mortalities / 12
             table[sex][age] = age_specific_mortalities
     return table
 
 
 def from_constant(ages: range, year_range:range) -> MortalityTable:
-    
     table = {}
     df = read_xlsx(config.MORTALITY_CONFIG[MortalityModel.CONSTANT]["realized_mortality"])
     latest_year = df["year"].max()
