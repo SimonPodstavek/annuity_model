@@ -9,6 +9,8 @@ from .mortality.mortality import build_mortality_table, build_survival_factors
 from .discount.discount import build_discount_factors
 from .annuity.annuity import Annuitant, Valuation
 
+from .helpers.convertor import generateRegionalGenderSpecificMortalityTables
+
 # Configure model parameters in config/config.py
 
 
@@ -18,32 +20,33 @@ def main() -> None:
     discount_factors: ndarray = build_discount_factors()
 
     if config.PRICING_MODEL == PricingModel.MWR:
-        pass
+    
         aggregates_path = Path("data/agregaty.xlsx")
         df = read_xlsx(aggregates_path, "data2")
         df = df[df["year"] == 2025]
 
         for index, row in df.iterrows():
             # Annuity configuration
-            annuitant = Annuitant(age_years = int(row["age"]), age_months=6, first_payment_year=2025, present_balance=row["mean_balance"], sex=Sex.TOTAL)
+            annuitant = Annuitant(age_years = int(row["age"]), age_months=6, first_payment_year=2025, present_balance=row["mean_balance"], sex=config.SEX)
         
             survival_factors: ndarray = build_survival_factors(annuitant = annuitant, mortality_table = mortality_table)
             valuation = Valuation(annuitant, survival_factors , discount_factors)
             annuity_factor_PV, modified_duration = valuation.calculateAnnuityFactor()
             fair_offer = annuitant.present_balance / annuity_factor_PV
 
-            print(f"{row["age"]}: MWR: {row["mean_offer"]/fair_offer}")
+            print(f"{row["age"]}: Offer: {row["mean_balance"]}  MWR: {row["mean_offer"]/fair_offer} mod.dur: {modified_duration}")
 
     if config.PRICING_MODEL == PricingModel.VALUE:
         # Annuity configuration
-        annuitant = Annuitant(age_years = 75, age_months = 6, first_payment_year=2025, present_balance=17967, sex=Sex.TOTAL)
-    
-        survival_factors: ndarray = build_survival_factors(annuitant = annuitant, mortality_table = mortality_table)
-        valuation = Valuation(annuitant, survival_factors , discount_factors)
-        annuity_factor_PV, modified_duration = valuation.calculateAnnuityFactor()
+            annuitant = Annuitant(age_years = 65, age_months = 6, first_payment_year=2025, present_balance=50000, sex=config.SEX)
+        
+            survival_factors: ndarray = build_survival_factors(annuitant = annuitant, mortality_table = mortality_table)
+            valuation = Valuation(annuitant, survival_factors , discount_factors)
+            annuity_factor_PV, modified_duration = valuation.calculateAnnuityFactor()
 
-        fair_offer = annuitant.present_balance / annuity_factor_PV
-        print(fair_offer)
+            fair_offer = annuitant.present_balance / annuity_factor_PV
+            print(f"{fair_offer}")
 
 if __name__ == "__main__":
+    generateRegionalGenderSpecificMortalityTables()
     main()

@@ -27,20 +27,27 @@ class Valuation:
         macaulay_duration_numerator = 0
         annuity_factor_PV = 0   
 
+
         age_span_months = config.AGE_END_MONTHS - self.annuitant.initial_month_age 
+        annuity_factor_series = np.zeros(age_span_months)
         # year_range = range(config.BASE_YEAR,(config.BASE_YEAR) + ceil((age_span_months)/12)+1)
 
-
+        count = 0
 
         if config.GUARANTEE_84_MONTHS:
             for delta_months in range(84):
                 AF = self.discount_factors[delta_months]
                 macaulay_duration_numerator += AF * (delta_months/12)
                 annuity_factor_PV += AF
+                annuity_factor_series[count] = AF
+                count +=1
+                
             for delta_months in range(84,age_span_months):
                 AF = self.survival_factors[delta_months] * self.discount_factors[delta_months]
                 macaulay_duration_numerator += AF * (delta_months/12)
                 annuity_factor_PV += AF
+                annuity_factor_series[count] = AF
+                count +=1
         else:
             for delta_months in range(age_span_months):
                 AF = self.survival_factors[delta_months] * self.discount_factors[delta_months]

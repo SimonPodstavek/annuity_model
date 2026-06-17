@@ -19,7 +19,9 @@ def build_survival_factors(annuitant: Annuitant, mortality_table: MortalityTable
         t = annuitant.initial_month_age + i
         year_delta = i//12
           
+        # sx = sx * (1-age_specific_mortality_table[t][year_delta]*0.68)
         sx = sx * (1-age_specific_mortality_table[t][year_delta]*0.68)
+
         survival_factors[i] = sx
     return survival_factors 
 

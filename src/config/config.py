@@ -3,35 +3,28 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parents[2]
 
+
+
 # Step 1: Choose any of the 3 available interest rate models (ZERO, SVENSSON, FIXED) and change parameters of the respective model in DISCOUNT_CONFIG.
-DISCOUNT_MODEL = DiscountModel.FULL_DISCOUNT_SERIES
+DISCOUNT_MODEL = DiscountModel.FIXED
 
 DISCOUNT_CONFIG = {
     DiscountModel.FIXED: {
+        # "fixed_rate": -0.0075
         "fixed_rate": 0.00
-    },
-    DiscountModel.SVENSSON: {
-            "parameters": {
-                "b0": 1.278278,
-                "b1": 0.675994,
-                "b2": 1.847009,
-                "b3": 7.168526,
-                "t1": 0.974988,
-                "t2": 15.774611	
-        }
     },
 
     # 2025
-    # DiscountModel.SVENSSON: {
-    #         "parameters": {
-    #             "b0": 0.904845,
-    #             "b1": 0.977872,
-    #             "b2": -0.741577,
-    #             "b3": 6.815022,
-    #             "t1": 1.901189,
-    #             "t2": 12.568325	
-    #     }
-    # }
+    DiscountModel.SVENSSON: {
+            "parameters": {
+                "b0": 1.320989,
+                "b1": 0.796082,
+                "b2": 1.890478,
+                "b3": 7.269523,
+                "t1": 0.927091,
+                "t2": 15.453865	
+        }
+    },
     DiscountModel.FULL_DISCOUNT_SERIES: {
         "discount_series_path": Path(BASE_DIR / "data/cluster_yields.npy" )
     }
@@ -54,14 +47,13 @@ MORTALITY_MODEL = MortalityModel.CONSTANT
 
 # Step 2.2 Update dataset paths
 DATASET_PATH = {
-    "susr_mortality_path": Path(BASE_DIR / "data/susr_mortality.xlsx" ),
-    "europop_mortality_path": Path(BASE_DIR / "data/europop_mortality.xlsx"),
-    "RRZ_mortality_path": Path(BASE_DIR / "data/RRZ_mortality_projection.xlsx"),
-    "regional_mortality_path": Path(BASE_DIR / "data/regional_mortality.xlsx" ),
-    "lithuania_mortality_path": Path(BASE_DIR / "data/foreign/lithuania_full_mortality_surface.xlsx"),
-    "germany_mortality_path": Path(BASE_DIR / "data/foreign/germany_full_mortality_surface.xlsx"),
-    "latvia_mortality_path": Path(BASE_DIR / "data/foreign/latvia_full_mortality_surface.xlsx"),
-    "ireland_mortality_path": Path(BASE_DIR / "data/foreign/ireland_full_mortality_surface.xlsx"),
+    "susr_mortality_path": Path(BASE_DIR / "data/mortality/susr_mortality.xlsx" ),
+    "europop_mortality_path": Path(BASE_DIR / "data/mortality/europop_mortality.xlsx"),
+    "RRZ_mortality_path": Path(BASE_DIR / "data/mortality/RRZ_mortality_projection.xlsx"),
+    "lithuania_mortality_path": Path(BASE_DIR / "data/mortality/foreign/lithuania_full_mortality_surface.xlsx"),
+    "germany_mortality_path": Path(BASE_DIR / "data/mortality/foreign/germany_full_mortality_surface.xlsx"),
+    "latvia_mortality_path": Path(BASE_DIR / "data/mortality/foreign/latvia_full_mortality_surface.xlsx"),
+    "ireland_mortality_path": Path(BASE_DIR / "data/mortality/foreign/ireland_full_mortality_surface.xlsx"),
 }
 
 
@@ -77,7 +69,7 @@ MORTALITY_CONFIG = {
 
 # Step 2.4: Chooose sex type. Make sure that the sex type is available in both datasets provided (THIS IS NOT CHECKED, and if chosen sex is not available, the model WILL FAIL)
 # Check in schams.py that the encoded representation matches that of dataset (E.g. Sex.FEMALE corresponds to F, and therefore F must be in the Sex field)
-SEX_TYPE = Sex.TOTAL
+SEX = Sex.TOTAL
 
 # Step 3: Set annuity pruchase year. (default 2026) This is also the time when the annuity the annuity starts paying out (no deferred annuities).
 BASE_YEAR = 2026
@@ -89,7 +81,7 @@ AGE_START_MONTHS = 360 #360 = 30 years 0 months (inclusive)
 AGE_END_MONTHS = 1200 #1200 = 100 years 0 months (exclusive)
 
 # Step 4: Choose the mode of the tool - calculate annuity / calculate MWR
-PRICING_MODEL = PricingModel.MWR
+PRICING_MODEL = PricingModel.VALUE
 
 # Step 5: Choose whether to take into account 7 year guarantee as defined in § 32 of 43/2004
 GUARANTEE_84_MONTHS = True
@@ -103,6 +95,7 @@ config = Config(
     BASE_YEAR = BASE_YEAR,
     AGE_START_MONTHS = AGE_START_MONTHS,
     AGE_END_MONTHS = AGE_END_MONTHS,
+    SEX = SEX ,
     GUARANTEE_84_MONTHS = GUARANTEE_84_MONTHS,
     
 )

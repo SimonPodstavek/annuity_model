@@ -37,6 +37,7 @@ class Config:
     BASE_YEAR: int
     AGE_START_MONTHS: int
     AGE_END_MONTHS: int
+    SEX: Sex
     GUARANTEE_84_MONTHS: bool
 
 
