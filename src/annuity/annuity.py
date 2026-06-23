@@ -22,40 +22,48 @@ class Valuation:
         self.survival_factors = survival_factors
         self.discount_factors = discount_factors
 
-    def calculateAnnuityFactor(self) -> tuple[float, float]:
+    def calculateAnnuityFactor(self) -> tuple[float, float, float]:
         # Survival function modeling 
-        macaulay_duration_numerator = 0
+        modified_duration_numerator = 0
+        present_yield_numerator = 0
         annuity_factor_PV = 0   
 
 
         age_span_months = config.AGE_END_MONTHS - self.annuitant.initial_month_age 
-        annuity_factor_series = np.zeros(age_span_months)
-        # year_range = range(config.BASE_YEAR,(config.BASE_YEAR) + ceil((age_span_months)/12)+1)
 
         count = 0
 
         if config.GUARANTEE_84_MONTHS:
             for delta_months in range(84):
+                t_idx = -1/((delta_months+1)/12)
                 AF = self.discount_factors[delta_months]
-                macaulay_duration_numerator += AF * (delta_months/12)
+                modified_duration_numerator += AF * (delta_months/12)
+                present_yield_numerator +=  AF * (pow(self.discount_factors[delta_months], t_idx) -1)
                 annuity_factor_PV += AF
-                annuity_factor_series[count] = AF
                 count +=1
                 
             for delta_months in range(84,age_span_months):
+                t_idx = -1/((delta_months+1)/12)
                 AF = self.survival_factors[delta_months] * self.discount_factors[delta_months]
-                macaulay_duration_numerator += AF * (delta_months/12)
+                modified_duration_numerator += AF * (delta_months/12)
+                present_yield_numerator += AF * (pow(self.discount_factors[delta_months],t_idx) -1)
                 annuity_factor_PV += AF
-                annuity_factor_series[count] = AF
                 count +=1
         else:
             for delta_months in range(age_span_months):
+                t_idx = -1/((delta_months+1)/12)
                 AF = self.survival_factors[delta_months] * self.discount_factors[delta_months]
-                macaulay_duration_numerator += AF * (delta_months/12)
+                modified_duration_numerator += AF * (delta_months/12)
+                present_yield_numerator += AF * (pow(self.discount_factors[delta_months], t_idx) -1)
                 annuity_factor_PV += AF
 
-        # Calculate modified duration for the annuity 
-        maccaulay_duration = macaulay_duration_numerator/annuity_factor_PV
-        modified_duration = maccaulay_duration / (1+ self.discount_factors[ceil(maccaulay_duration)*12]/12)
+        # Calculate the annualized effective yield that a portfolio is making at this instant 
+        portfolio_effective_yield = present_yield_numerator / annuity_factor_PV
 
-        return annuity_factor_PV, modified_duration
+        # Calculate modified duration for the annuity 
+        modified_duration = modified_duration_numerator / annuity_factor_PV
+        
+        # Adjust for insurer variable fee
+        annuity_factor_PV = annuity_factor_PV / (1-config.VARIABLE_FEE)
+
+        return annuity_factor_PV, modified_duration, portfolio_effective_yield

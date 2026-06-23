@@ -11,15 +11,12 @@ def build_survival_factors(annuitant: Annuitant, mortality_table: MortalityTable
     initial_year = annuitant.first_payment_year
     
     age_specific_mortality_table = mortality_table[annuitant.sex]
-
     survival_factors = np.zeros(time_span)
     sx = 1
 
     for i in range(time_span):
         t = annuitant.initial_month_age + i
         year_delta = i//12
-          
-
         qx = age_specific_mortality_table[t][year_delta] * config.RELATIVE_MORTALITY
         sx = sx * (1-qx)
 
@@ -41,7 +38,7 @@ def build_mortality_table() -> MortalityTable:
 
 def from_full_surface(ages: range, year_range:range) -> MortalityTable:
     table = {}
-    df = read_xlsx(config.MORTALITY_CONFIG[MortalityModel.FULL_MORTALITY_SURFACE]["mortality_prediction"])
+    df = read_xlsx(config.MORTALITY_CONFIG[MortalityModel.FULL_MORTALITY_SURFACE]["mortality_prediction"],sheet_name="mortality")
 
     age_specific_mortalities = None
 

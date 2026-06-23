@@ -1,38 +1,12 @@
 from .schemas import Config, DiscountModel, MortalityModel, PricingModel,  Sex
 from pathlib import Path
+from itertools import combinations
+from math import factorial
 
 BASE_DIR = Path(__file__).resolve().parents[2]
 
-FEATURES = ["sex", "regional_mortality", "selection_bias", "fixed_fee", "duration_mismatch", "excess_return_payout", "84_month_guarantee"]
-
-# Values in real scenario
-ACTUAL = {
-    "sex": Sex.TOTAL,
-    "regional_mortality": (Path(BASE_DIR / "data/mortality/RRZ_mortality_projection.xlsx")),
-    "selection_bias": 0.68,
-    "fixed_fee": None,
-    "duration_mismatch": None,
-    "excess_return_payout": None,
-    "guarantee_84_months": True
-}
-
-
-# Values in ideal scenario
-BENCHMARK = {
-    "sex": Sex.MALE,
-    "regional_mortality": Path(BASE_DIR / "data/mortality/RRZ_mortality_projection.xlsx"),
-    "selection_bias": 1,
-    "fixed_fee": None,
-    "duration_mismatch": None,
-    "excess_return_payout": None,
-    "guarantee_84_months": False
-}
-
-def build_config():
-    pass
-
 # Step 1: Choose any of the 3 available interest rate models (ZERO, SVENSSON, FIXED) and change parameters of the respective model in DISCOUNT_CONFIG.
-DISCOUNT_MODEL = DiscountModel.FIXED
+DISCOUNT_MODEL = DiscountModel.SVENSSON
 
 DISCOUNT_CONFIG = {
     DiscountModel.FIXED: {
@@ -40,15 +14,15 @@ DISCOUNT_CONFIG = {
         "fixed_rate": 0.01
     },
 
-    # 2025
+    #  1 July 2025
     DiscountModel.SVENSSON: {
             "parameters": {
-                "b0": 1.320989,
-                "b1": 0.796082,
-                "b2": 1.890478,
-                "b3": 7.269523,
-                "t1": 0.927091,
-                "t2": 15.453865	
+                "b0": 0.996390,
+                "b1": 0.896780,
+                "b2": -0.953647,
+                "b3": 6.818138,
+                "t1": 2.028327,
+                "t2": 12.022171	
         }
     },
     DiscountModel.FULL_DISCOUNT_SERIES: {
@@ -56,7 +30,6 @@ DISCOUNT_CONFIG = {
     }
 }
 	
-
 # Step 2.1: This model uses one of two modes of operation for mortality prediction:
 MORTALITY_MODEL = MortalityModel.FULL_MORTALITY_SURFACE
 
@@ -86,7 +59,7 @@ DATASET_PATH = {
 # Step 2.3 Update mortality config according to 2.1
 MORTALITY_CONFIG = {
     MortalityModel.FULL_MORTALITY_SURFACE:{
-        "mortality_prediction": DATASET_PATH["latvia_mortality_path"]
+        "mortality_prediction": DATASET_PATH["RRZ_mortality_path"]
     },
     MortalityModel.CONSTANT: {
         "realized_mortality": DATASET_PATH["susr_mortality_path"]
@@ -107,13 +80,16 @@ AGE_START_MONTHS = 360 #360 = 30 years 0 months (inclusive)
 AGE_END_MONTHS = 1200 #1200 = 100 years 0 months (exclusive)
 
 # Step 4: Choose the mode of the tool - calculate annuity / calculate MWR
-PRICING_MODEL = PricingModel.MWR
+PRICING_MODEL = PricingModel.VALUE
 
 # Step 5: Choose whether to take into account 7 year guarantee as defined in § 32 of 43/2004
 GUARANTEE_84_MONTHS = True
 
 # Step 6: Set the relative mortality of annuitant in relation to the general population 
 RELATIVE_MORTALITY = 0.68
+
+# Step 7: Set the variable fee that the insurer demands for their services
+VARIABLE_FEE = 0
 
 
 config = Config(
@@ -125,8 +101,8 @@ config = Config(
     BASE_YEAR = BASE_YEAR,
     AGE_START_MONTHS = AGE_START_MONTHS,
     AGE_END_MONTHS = AGE_END_MONTHS,
-    SEX = SEX ,
+    SEX = SEX,
     GUARANTEE_84_MONTHS = GUARANTEE_84_MONTHS,
-    RELATIVE_MORTALITY = RELATIVE_MORTALITY
-    
+    RELATIVE_MORTALITY = RELATIVE_MORTALITY,
+    VARIABLE_FEE = VARIABLE_FEE
 )

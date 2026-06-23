@@ -40,6 +40,7 @@ class Config:
     SEX: Sex
     GUARANTEE_84_MONTHS: bool
     RELATIVE_MORTALITY: float
+    VARIABLE_FEE: float
 
 
 # MortalityTable[sex][age_months] -> ndarray of length n_years
