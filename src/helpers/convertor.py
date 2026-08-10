@@ -5,9 +5,9 @@ from pathlib import Path
 from ..config.config import BASE_DIR
 
 BASE_YEAR = 2025
-END_YEAR = 2101  # inclusive
+END_YEAR = 2101  # exclusive
 
-REGION_CODES = ["ZA", "TN", "TT", "PO", "NR", "KE", "BB", "BA"]
+REGION_CODES = ["ZA", "TN", "TT", "PO", "NR", "KE", "BB", "BA", "total"]
 
 
 def _fit_decay_factors(ep_mort_df):
@@ -20,7 +20,7 @@ def _fit_decay_factors(ep_mort_df):
     ep = ep_mort_df.copy()
     ep["age"] = ep["age"].str.split(" ").str[0].astype(int)
     ep["sex"] = ep["sex"].map({"Females": "F", "Males": "M"})
-    ep = ep[(ep["TIME_PERIOD"] >= BASE_YEAR) & (ep["TIME_PERIOD"] <= END_YEAR)]
+    ep = ep[(ep["TIME_PERIOD"] >= BASE_YEAR) & (ep["TIME_PERIOD"] < END_YEAR)]
 
     def fit(group):
         years = group["TIME_PERIOD"].to_numpy() - BASE_YEAR
@@ -73,7 +73,7 @@ def _extrapolate(base_df, factors, extra_cols=()):
 
     `extra_cols` are leading identifier columns to carry through (e.g."region" for the combined sheet).
     """
-    years = range(BASE_YEAR, END_YEAR + 1)
+    years = range(BASE_YEAR, END_YEAR)
     rows = []
     for row in base_df.itertuples(index=False):
         record = row._asdict()

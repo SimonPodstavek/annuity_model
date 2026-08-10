@@ -22,8 +22,9 @@ class Sex(Enum):
 
 
 class PricingModel(Enum):
-    MWR = "MWR"
+    FEES = "FEES"
     VALUE = "VALUE"
+    SHAPLEY = "SHAPLEY" 
 
 
 
@@ -41,6 +42,8 @@ class Config:
     GUARANTEE_84_MONTHS: bool
     RELATIVE_MORTALITY: float
     VARIABLE_FEE: float
+    YEARLY_INCREASE_COEFFICIENT: float
+    SURVIVOR_COVERAGE: int
 
 
 # MortalityTable[sex][age_months] -> ndarray of length n_years

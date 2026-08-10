@@ -6,12 +6,11 @@ from math import factorial
 BASE_DIR = Path(__file__).resolve().parents[2]
 
 # Step 1: Choose any of the 3 available interest rate models (ZERO, SVENSSON, FIXED) and change parameters of the respective model in DISCOUNT_CONFIG.
-DISCOUNT_MODEL = DiscountModel.SVENSSON
+DISCOUNT_MODEL = DiscountModel.FIXED
 
 DISCOUNT_CONFIG = {
     DiscountModel.FIXED: {
-        # "fixed_rate": -0.0075
-        "fixed_rate": 0.01
+        "fixed_rate": 0.0
     },
 
     #  1 July 2025
@@ -49,6 +48,7 @@ DATASET_PATH = {
     "susr_mortality_path": Path(BASE_DIR / "data/mortality/susr_mortality.xlsx" ),
     "europop_mortality_path": Path(BASE_DIR / "data/mortality/europop_mortality.xlsx"),
     "RRZ_mortality_path": Path(BASE_DIR / "data/mortality/RRZ_mortality_projection.xlsx"),
+    "presov_mortality_path": Path(BASE_DIR / "data/mortality/regions/regional_mortality_PO_extrapolated.xlsx"),
     "lithuania_mortality_path": Path(BASE_DIR / "data/mortality/foreign/lithuania_full_mortality_surface.xlsx"),
     "germany_mortality_path": Path(BASE_DIR / "data/mortality/foreign/germany_full_mortality_surface.xlsx"),
     "latvia_mortality_path": Path(BASE_DIR / "data/mortality/foreign/latvia_full_mortality_surface.xlsx"),
@@ -59,7 +59,7 @@ DATASET_PATH = {
 # Step 2.3 Update mortality config according to 2.1
 MORTALITY_CONFIG = {
     MortalityModel.FULL_MORTALITY_SURFACE:{
-        "mortality_prediction": DATASET_PATH["RRZ_mortality_path"]
+        "mortality_prediction": DATASET_PATH["europop_mortality_path"]
     },
     MortalityModel.CONSTANT: {
         "realized_mortality": DATASET_PATH["susr_mortality_path"]
@@ -79,24 +79,31 @@ AGE_START_MONTHS = 360 #360 = 30 years 0 months (inclusive)
 # 99 years of life - Used as range for computing life table
 AGE_END_MONTHS = 1200 #1200 = 100 years 0 months (exclusive)
 
-# Step 4: Choose the mode of the tool - calculate annuity / calculate MWR
+# Step 4: Choose the mode of the tool - calculate annuity (PricingModel.VALUE) / calculate fees (PricingModel.FEES)
 PRICING_MODEL = PricingModel.VALUE
 
 # Step 5: Choose whether to take into account 7 year guarantee as defined in § 32 of 43/2004
 GUARANTEE_84_MONTHS = True
 
-# Step 6: Set the relative mortality of annuitant in relation to the general population 
-RELATIVE_MORTALITY = 0.68
+# Step 6: Set the relativae mortality of annuitant in relation to the general population - this shoud be between 0  (immortality) and 2 (double the mortality of population)
+RELATIVE_MORTALITY = 1
 
-# Step 7: Set the variable fee that the insurer demands for their services
+# Step 7: Set the variable fee that the insurer demands for their services - this shoud be between 0  (no fee) and 1 (100% fee)
 VARIABLE_FEE = 0
+
+# Step 8: Set the fraction by which the annuity changes each year. Meaning: 0  (no annuity :( ), 0.5 (annuity halves every year) 1 (annuity remains the same), 2 (annuity doubles every year)
+YEARLY_INCREASE_COEFFICIENT = 1
+
+# Step 9 Set survivor coverage in months. Meaning: 0 (no survivor coverage), 12 (12 months survivor coverage), 24 (24 months survivor coverage)  
+SURVIVOR_COVERAGE = 0
+
 
 
 config = Config(
-    MORTALITY_MODEL=MORTALITY_MODEL,
-    MORTALITY_CONFIG=MORTALITY_CONFIG,
-    DISCOUNT_MODEL=DISCOUNT_MODEL,
-    DISCOUNT_CONFIG=DISCOUNT_CONFIG,
+    MORTALITY_MODEL = MORTALITY_MODEL,
+    MORTALITY_CONFIG = MORTALITY_CONFIG,
+    DISCOUNT_MODEL = DISCOUNT_MODEL,
+    DISCOUNT_CONFIG = DISCOUNT_CONFIG,
     PRICING_MODEL = PRICING_MODEL,
     BASE_YEAR = BASE_YEAR,
     AGE_START_MONTHS = AGE_START_MONTHS,
@@ -104,5 +111,7 @@ config = Config(
     SEX = SEX,
     GUARANTEE_84_MONTHS = GUARANTEE_84_MONTHS,
     RELATIVE_MORTALITY = RELATIVE_MORTALITY,
-    VARIABLE_FEE = VARIABLE_FEE
+    VARIABLE_FEE = VARIABLE_FEE,
+    YEARLY_INCREASE_COEFFICIENT = YEARLY_INCREASE_COEFFICIENT,
+    SURVIVOR_COVERAGE = SURVIVOR_COVERAGE
 )

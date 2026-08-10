@@ -1,9 +1,12 @@
-from pandas import DataFrame
+import pandas as pd
 from typing import Dict
 from pathlib import Path
-from numpy import ndarray
-from math import factorial
+import numpy as np
+from math import factorial, log
 from itertools import combinations
+import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
+
 
 from .config.schemas import Sex, MortalityTable, PricingModel
 from .config.config import config
@@ -11,11 +14,14 @@ from .data_io.excel import read_xlsx
 from .mortality.mortality import build_mortality_table, build_survival_factors
 from .discount.discount import build_discount_factors
 from .annuity.annuity import Annuitant, Valuation
-from .shapley.shapley import config, FEATURES, set_config
-# from .helpers.convertor import generateRegionalGenderSpecificMortalityTables
+from .shapley.shapley import FEATURES, set_config
+from .helpers.convertor import generateRegionalGenderSpecificMortalityTables
+
+# TODO
+# Add increasing annuity amount to shapley 
+
 
 # Configure model parameters in config/config.py
-
 def shapley_values() -> dict:
     N = len(FEATURES)
     phi = {}
@@ -23,7 +29,7 @@ def shapley_values() -> dict:
     set_config(frozenset())
 
     BENCHMARK_OFFER = calculateOffer()
-
+    count = 0
     for feature in FEATURES:
         others = [f for f in FEATURES if f != feature]
         phi[feature] = 0
@@ -32,10 +38,11 @@ def shapley_values() -> dict:
                 S_set = frozenset(s)
                 weight = factorial(len(s)) * factorial(N - len(s) -1) / factorial(N)
                 set_config(S_set)
-                subset_featureless_Offer = calculateOffer()
+                subset_featureless_Offer: float = calculateOffer()
                 set_config(S_set | {feature})
-                subset_Offer = calculateOffer()
-                phi[feature] += weight*(subset_Offer - subset_featureless_Offer) 
+                subset_Offer:float = calculateOffer()
+                phi[feature] += weight*(subset_Offer - subset_featureless_Offer)
+                count += 1
         phi[feature] /= BENCHMARK_OFFER
 
     return phi
@@ -44,43 +51,75 @@ def shapley_values() -> dict:
 def main():
     calculateOffer()
 
-def calculateOffer() -> float:
+def fee_function(x,b,c):
+#    return log(x,b) + c
+    return x*b+c
+
+def calculateOffer() -> float | None:
     
     mortality_table: MortalityTable = build_mortality_table()
-    discount_factors: ndarray = build_discount_factors()
+    discount_factors: np.ndarray = build_discount_factors()
 
-    if config.PRICING_MODEL == PricingModel.MWR:
-    
-        aggregates_path = Path("data/agregaty.xlsx")
-        df = read_xlsx(aggregates_path, "data2")
-        df = df[df["year"] == 2025]
 
-        for index, row in df.iterrows():
-            # Annuity configuration
-            annuitant = Annuitant(age_years = int(row["age"]), age_months=6, first_payment_year=2025, present_balance=row["mean_balance"], sex=config.SEX)
+    if config.PRICING_MODEL == PricingModel.FEES:
+        annuity_df = pd.read_csv('data/offers/114_AF_by_age_and_NS_quintiles.csv')
+        for index, row in annuity_df.iterrows():
+            # Annuity configurations
+            annuitant = Annuitant(age_years = int(row["age"]), age_months=6, first_payment_year=2025, present_balance=10000, sex=config.SEX)
         
-            survival_factors: ndarray = build_survival_factors(annuitant = annuitant, mortality_table = mortality_table)
+            survival_factors: np.ndarray = build_survival_factors(annuitant = annuitant, mortality_table = mortality_table)
             valuation = Valuation(annuitant, survival_factors , discount_factors)
             annuity_factor_PV, modified_duration,portfolio_effective_yield = valuation.calculateAnnuityFactor()
             fair_offer = annuitant.present_balance / annuity_factor_PV
 
-            print(f"Age: {row["age"]} Balance: {row["mean_balance"]}  MWR: {row["mean_offer"]/fair_offer}")
-            return fair_offer
+            annuity_df.loc[index, 'MWR'] = annuity_factor_PV /  row['AF']
+
+        # Captures 96.7% of offers in 2025
+        subset = annuity_df[annuity_df['age'].between(59,66)] 
+        subset['fee'] = subset['NS']*(1-subset['MWR'])
+
+        coefficients, covariance = curve_fit(fee_function, subset['NS'], subset['fee'])
+
+        fee_actual = subset['fee']
+        fee_pred = fee_function(subset['NS'], *coefficients)
+
+        # R² by hanq
+        ss_res = np.sum((fee_actual - fee_pred) ** 2)          # residual sum of squares
+        ss_tot = np.sum((fee_actual - fee_actual.mean()) ** 2) # total sum of squares
+        r_squared = 1 - (ss_res / ss_tot)
+
+
+
+        plt.scatter(subset['NS'], subset['fee'])
+        plt.show()
+
+    if config.PRICING_MODEL == PricingModel.SHAPLEY:
+        annuitant = Annuitant(age_years = 63, age_months = 6, first_payment_year=2025, present_balance=10000, sex=config.SEX)
+        survival_factors: np.ndarray = build_survival_factors(annuitant = annuitant, mortality_table = mortality_table)
+
+        valuation = Valuation(annuitant, survival_factors , discount_factors)
+        annuity_factor_PV, modified_duration, portfolio_effective_yield = valuation.calculateAnnuityFactor()
+
+        fair_offer = annuitant.present_balance / annuity_factor_PV
+        return fair_offer
+
 
     if config.PRICING_MODEL == PricingModel.VALUE:
         # Annuity configuration
-            annuitant = Annuitant(age_years = 65, age_months = 6, first_payment_year=2025, present_balance=50000, sex=config.SEX)
-        
-            survival_factors: ndarray = build_survival_factors(annuitant = annuitant, mortality_table = mortality_table)
+        for age in range(63,90):   
+            annuitant = Annuitant(age_years = 63, age_months = 6, first_payment_year=2025, present_balance=147369.52, sex=config.SEX)
+            survival_factors: np.ndarray = build_survival_factors(annuitant = annuitant, mortality_table = mortality_table)
+
             valuation = Valuation(annuitant, survival_factors , discount_factors)
             annuity_factor_PV, modified_duration, portfolio_effective_yield = valuation.calculateAnnuityFactor()
 
             fair_offer = annuitant.present_balance / annuity_factor_PV
             print(f"{fair_offer}")
-            return fair_offer
-    else:
-         return -1
+
+
+
 
 if __name__ == "__main__":
-    shapley_values()
-    # main()
+    # generateRegionalGenderSpecificMortalityTables()
+    # shapley_values()
+    main()  

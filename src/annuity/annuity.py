@@ -2,7 +2,7 @@ from ..config.schemas import Sex
 from ..config.config import config
 import numpy as np
 from numpy import ndarray
-from math import ceil
+from math import pow
 
 
 class Annuitant:
@@ -23,6 +23,7 @@ class Valuation:
         self.discount_factors = discount_factors
 
     def calculateAnnuityFactor(self) -> tuple[float, float, float]:
+
         # Survival function modeling 
         modified_duration_numerator = 0
         present_yield_numerator = 0
@@ -31,31 +32,28 @@ class Valuation:
 
         age_span_months = config.AGE_END_MONTHS - self.annuitant.initial_month_age 
 
-        count = 0
 
-        if config.GUARANTEE_84_MONTHS:
-            for delta_months in range(84):
-                t_idx = -1/((delta_months+1)/12)
-                AF = self.discount_factors[delta_months]
-                modified_duration_numerator += AF * (delta_months/12)
-                present_yield_numerator +=  AF * (pow(self.discount_factors[delta_months], t_idx) -1)
-                annuity_factor_PV += AF
-                count +=1
-                
-            for delta_months in range(84,age_span_months):
-                t_idx = -1/((delta_months+1)/12)
-                AF = self.survival_factors[delta_months] * self.discount_factors[delta_months]
-                modified_duration_numerator += AF * (delta_months/12)
-                present_yield_numerator += AF * (pow(self.discount_factors[delta_months],t_idx) -1)
-                annuity_factor_PV += AF
-                count +=1
-        else:
-            for delta_months in range(age_span_months):
-                t_idx = -1/((delta_months+1)/12)
-                AF = self.survival_factors[delta_months] * self.discount_factors[delta_months]
-                modified_duration_numerator += AF * (delta_months/12)
-                present_yield_numerator += AF * (pow(self.discount_factors[delta_months], t_idx) -1)
-                annuity_factor_PV += AF
+        for delta_months in range(age_span_months):
+            t_idx = -1 / ((delta_months + 0.00000001) / 12)
+
+            # Calculate the premium for survivor coverage
+            unconditional_qx = self.survival_factors[delta_months] - self.survival_factors[min(delta_months+1,age_span_months-1)]
+            AF_contribution = config.SURVIVOR_COVERAGE*unconditional_qx* self.discount_factors[delta_months]
+
+            
+            if config.GUARANTEE_84_MONTHS and delta_months < 84:
+                AF_contribution += self.discount_factors[delta_months] 
+            else:
+                AF_contribution += self.survival_factors[delta_months] * self.discount_factors[delta_months]
+
+            # Adjust for increasing annuities
+            AF_contribution *= pow(config.YEARLY_INCREASE_COEFFICIENT, delta_months / 12)
+
+            modified_duration_numerator += AF_contribution * (delta_months / 12)
+            present_yield_numerator += AF_contribution * (pow(self.discount_factors[delta_months], t_idx) - 1)
+            annuity_factor_PV += AF_contribution
+
+
 
         # Calculate the annualized effective yield that a portfolio is making at this instant 
         portfolio_effective_yield = present_yield_numerator / annuity_factor_PV
