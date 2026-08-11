@@ -45,9 +45,13 @@ def shapley_values() -> dict:
                 count += 1
         phi[feature] /= BENCHMARK_OFFER
 
-    for factor in phi.values():
-        print(factor)
+    vector = []
+    for factor in phi:
+        print(f"{factor}: {phi[factor]}")
+        vector.append(phi[factor])
+    print(', '.join(str(v) for v in vector))
 
+    pass
 
 def main():
     calculateOffer()

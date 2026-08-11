@@ -5,21 +5,21 @@ from ..config.config import config, BASE_DIR
 
 FEATURES = ["sex", "relative_mortality", "variable_fee", "duration_mismatch", "excess_return_payout", "guarantee_84_months", "yearly_increase_coefficient", "survivor_coverage"]
 
-# Values in real scenario #1
+# Values used for calculation in real scenario
 ACTUAL = {
     "sex": Sex.TOTAL,
     "relative_mortality": 0.6,
-    "variable_fee": 0.06,
+    "variable_fee": 0.21,
     "duration_mismatch": True,
     "excess_return_payout": True,
     "guarantee_84_months": True,
-    "yearly_increase_coefficient": 1.02,
-    "survivor_coverage": 12
+    "yearly_increase_coefficient": 1,
+    "survivor_coverage": 0
 }
 
 # Values in ideal scenario
 BENCHMARK = {
-    "sex": Sex.MALE,
+    "sex": Sex.FEMALE,
     "relative_mortality": 1,
     "variable_fee": 0,
     "duration_mismatch": False,
@@ -52,7 +52,7 @@ def set_config(subset: frozenset) -> None:
     # Discount rate is only the guaranteed return (CIPS: garantovaný výnos) 
     if excess_return_payout:
         DISCOUNT_MODEL = DiscountModel.FIXED
-        DISCOUNT_CONFIG ={DiscountModel.FIXED: {"fixed_rate": 0.0}}
+        DISCOUNT_CONFIG ={DiscountModel.FIXED: {"fixed_rate": 0.01}}
 
     # Insurer doesn't pay out excess returns, hence they can use the entire yield as discount rate. But, assume that the discount rate is equal to 2Y discount rate (from Svensson model) as there is the duration mismatch 
     elif duration_mismatch:
