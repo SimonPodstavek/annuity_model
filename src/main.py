@@ -45,14 +45,14 @@ def shapley_values() -> dict:
                 count += 1
         phi[feature] /= BENCHMARK_OFFER
 
-    return phi
+    for factor in phi.values():
+        print(factor)
 
 
 def main():
     calculateOffer()
 
 def fee_function(x,b,c):
-#    return log(x,b) + c
     return x*b+c
 
 def calculateOffer() -> float | None:
@@ -62,7 +62,7 @@ def calculateOffer() -> float | None:
 
 
     if config.PRICING_MODEL == PricingModel.FEES:
-        annuity_df = pd.read_csv('data/offers/114_AF_by_age_and_NS_quintiles.csv')
+        annuity_df = pd.read_csv('data/offers/105_AF_by_age_and_NS_quintiles.csv')
         for index, row in annuity_df.iterrows():
             # Annuity configurations
             annuitant = Annuitant(age_years = int(row["age"]), age_months=6, first_payment_year=2025, present_balance=10000, sex=config.SEX)
@@ -88,8 +88,6 @@ def calculateOffer() -> float | None:
         ss_tot = np.sum((fee_actual - fee_actual.mean()) ** 2) # total sum of squares
         r_squared = 1 - (ss_res / ss_tot)
 
-
-
         plt.scatter(subset['NS'], subset['fee'])
         plt.show()
 
@@ -114,12 +112,12 @@ def calculateOffer() -> float | None:
             annuity_factor_PV, modified_duration, portfolio_effective_yield = valuation.calculateAnnuityFactor()
 
             fair_offer = annuitant.present_balance / annuity_factor_PV
-            print(f"{fair_offer}")
+            print(f"{portfolio_effective_yield}")
 
 
 
 
 if __name__ == "__main__":
     # generateRegionalGenderSpecificMortalityTables()
-    # shapley_values()
-    main()  
+    # main()  
+    shapley_values()

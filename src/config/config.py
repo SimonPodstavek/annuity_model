@@ -6,11 +6,11 @@ from math import factorial
 BASE_DIR = Path(__file__).resolve().parents[2]
 
 # Step 1: Choose any of the 3 available interest rate models (ZERO, SVENSSON, FIXED) and change parameters of the respective model in DISCOUNT_CONFIG.
-DISCOUNT_MODEL = DiscountModel.FIXED
+DISCOUNT_MODEL = DiscountModel.SVENSSON
 
 DISCOUNT_CONFIG = {
     DiscountModel.FIXED: {
-        "fixed_rate": 0.0
+        "fixed_rate": 0.01
     },
 
     #  1 July 2025

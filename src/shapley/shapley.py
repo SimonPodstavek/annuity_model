@@ -5,17 +5,16 @@ from ..config.config import config, BASE_DIR
 
 FEATURES = ["sex", "relative_mortality", "variable_fee", "duration_mismatch", "excess_return_payout", "guarantee_84_months", "yearly_increase_coefficient", "survivor_coverage"]
 
-# Values in real scenario
+# Values in real scenario #1
 ACTUAL = {
     "sex": Sex.TOTAL,
     "relative_mortality": 0.6,
-    "variable_fee": 0.1,
+    "variable_fee": 0.06,
     "duration_mismatch": True,
     "excess_return_payout": True,
     "guarantee_84_months": True,
     "yearly_increase_coefficient": 1.02,
     "survivor_coverage": 12
-
 }
 
 # Values in ideal scenario
@@ -50,23 +49,17 @@ def set_config(subset: frozenset) -> None:
     # if duration_mismatch, then the insurer received only fixed length on short term maturities
     # if excess_return_payout, then the insurer may pay out excess return. In calculation, act as if though they did not to estimate the effect. If excess_return_payout, then the annuity amount should be lower
 
-    if duration_mismatch and excess_return_payout:
+    # Discount rate is only the guaranteed return (CIPS: garantovaný výnos) 
+    if excess_return_payout:
         DISCOUNT_MODEL = DiscountModel.FIXED
-        DISCOUNT_CONFIG ={DiscountModel.FIXED: {"fixed_rate": 0.01}}
-    elif duration_mismatch and not excess_return_payout:
+        DISCOUNT_CONFIG ={DiscountModel.FIXED: {"fixed_rate": 0.0}}
+
+    # Insurer doesn't pay out excess returns, hence they can use the entire yield as discount rate. But, assume that the discount rate is equal to 2Y discount rate (from Svensson model) as there is the duration mismatch 
+    elif duration_mismatch:
         DISCOUNT_MODEL = DiscountModel.FIXED
-        DISCOUNT_CONFIG ={DiscountModel.FIXED: {"fixed_rate": 0.02520}}
-    elif not duration_mismatch and excess_return_payout:
-        DISCOUNT_MODEL = DiscountModel.SVENSSON
-        DISCOUNT_CONFIG ={DiscountModel.SVENSSON:{
-            "parameters": {
-                "b0": 0,
-                "b1": 0.896780,
-                "b2": -0.953647,
-                "b3": 6.818138,
-                "t1": 2.028327,
-                "t2": 12.022171	
-        }}}
+        DISCOUNT_CONFIG ={DiscountModel.FIXED: {"fixed_rate": 0.01823981}}
+
+        # Svensson parameters as of  1 July 2025
     else:
         DISCOUNT_MODEL = DiscountModel.SVENSSON
         DISCOUNT_CONFIG ={DiscountModel.SVENSSON:{
